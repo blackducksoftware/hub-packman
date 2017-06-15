@@ -22,16 +22,54 @@
  */
 package com.blackducksoftware.integration.hub.detect.util
 
+import org.slf4j.Logger
+import org.slf4j.LoggerFactory
 import org.springframework.beans.factory.annotation.Autowired
+import org.springframework.stereotype.Component
 
 import com.blackducksoftware.integration.hub.detect.DetectProperties
 import com.blackducksoftware.integration.hub.detect.type.BomToolType
 
+@Component
 class FileHelper {
+    final Logger logger = LoggerFactory.getLogger(this.getClass())
 
     @Autowired
     DetectProperties detectProperties
 
     File getOutputDirectory(BomToolType bomToolType) {
+        def outputDirectory = new File(detectProperties.outputDirectoryPath, bomToolType.toString().toLowerCase())
+        outputDirectory.mkdir()
+
+        outputDirectory
+    }
+
+    File createTempFile(BomToolType bomToolType, String fileName) {
+        File outputDirectory = getOutputDirectory(bomToolType)
+
+        new File(outputDirectory, fileName)
+    }
+
+    File writeToTempFile(File file, String contents) {
+        writeToTempFile(file, contents, true)
+    }
+
+    File writeToTempFile(File file, String contents, boolean overwrite) {
+        if(!file) {
+            return null
+        }
+        if(detectProperties.cleanupBomtoolFiles) {
+            file.deleteOnExit()
+        }
+        if(overwrite) {
+            file.delete()
+        }
+        if (file.exists()) {
+            logger.info("${file.getAbsolutePath()} exists and not being overwritten")
+        } else {
+            file << contents
+        }
+
+        file
     }
 }
