@@ -41,35 +41,23 @@ class DetectFileManager {
     FileFinder fileFinder
 
     File createDirectory(BomToolType bomToolType) {
-        createDirectory(bomToolType.toString().toLowerCase())
-    }
-
-    File createDirectory(String directoryName) {
-        createDirectory(detectConfiguration.outputDirectory, directoryName)
-    }
-
-    File createDirectory(File directory, String newDirectoryName) {
-        def newDirectory = new File(directory, newDirectoryName)
-        newDirectory.mkdir()
+        def outputDirectory = new File(detectConfiguration.outputDirectory, bomToolType.toString().toLowerCase())
+        outputDirectory.mkdir()
         if (detectConfiguration.cleanupBomToolFiles) {
-            newDirectory.deleteOnExit()
+            outputDirectory.deleteOnExit()
         }
 
-        newDirectory
+        outputDirectory
     }
 
-    File createFile(File directory, String filename) {
-        def newFile = new File(directory, filename)
+    File createFile(BomToolType bomToolType, String fileName) {
+        File outputDirectory = createDirectory(bomToolType)
+        def newFile = new File(outputDirectory, fileName)
         if (detectConfiguration.cleanupBomToolFiles) {
             newFile.deleteOnExit()
         }
 
         newFile
-    }
-
-    File createFile(BomToolType bomToolType, String filename) {
-        File directory = createDirectory(bomToolType)
-        createFile(directory, filename)
     }
 
     File writeToFile(File file, String contents) {

@@ -28,6 +28,7 @@ import org.slf4j.Logger
 import org.slf4j.LoggerFactory
 import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.boot.ApplicationArguments
+import org.springframework.boot.Banner
 import org.springframework.boot.autoconfigure.SpringBootApplication
 import org.springframework.boot.builder.SpringApplicationBuilder
 import org.springframework.context.annotation.Bean
@@ -37,28 +38,13 @@ import com.blackducksoftware.integration.hub.bdio.simple.BdioPropertyHelper
 import com.blackducksoftware.integration.hub.bdio.simple.DependencyNodeTransformer
 import com.blackducksoftware.integration.hub.bdio.simple.model.externalid.ExternalId
 import com.blackducksoftware.integration.hub.detect.help.HelpPrinter
-import com.blackducksoftware.integration.hub.detect.help.ValueDescriptionAnnotationFinder
 import com.blackducksoftware.integration.hub.detect.hub.BdioUploader
-import com.blackducksoftware.integration.hub.detect.hub.HubSignatureScanner
-import com.blackducksoftware.integration.hub.detect.util.executable.ExecutableManager
 import com.google.gson.Gson
 import com.google.gson.GsonBuilder
 
 @SpringBootApplication
 class Application {
     private final Logger logger = LoggerFactory.getLogger(Application.class)
-
-    @Autowired
-    ValueDescriptionAnnotationFinder valueDescriptionAnnotationFinder
-
-    @Autowired
-    DetectConfiguration detectConfiguration
-
-    @Autowired
-    ExecutableManager executableManager
-
-    @Autowired
-    HubSignatureScanner hubSignatureScanner
 
     @Autowired
     BdioPropertyHelper bdioPropertyHelper
@@ -76,27 +62,27 @@ class Application {
     ApplicationArguments applicationArguments
 
     @Autowired
+    DetectConfiguration detectConfiguration
+
+    @Autowired
     HelpPrinter helpPrinter
 
     static void main(final String[] args) {
-        new SpringApplicationBuilder(Application.class).logStartupInfo(false).run(args)
+        new SpringApplicationBuilder(Application.class).bannerMode(Banner.Mode.OFF).logStartupInfo(false).run(args)
     }
 
     @PostConstruct
     void init() {
-        valueDescriptionAnnotationFinder.init()
         if ('-h' in applicationArguments.getSourceArgs() || '--help' in applicationArguments.getSourceArgs()) {
             helpPrinter.printHelpMessage(System.out)
         } else {
             detectConfiguration.init()
-            executableManager.init()
             logger.info('Configuration processed completely.')
             if (Boolean.FALSE == detectConfiguration.suppressConfigurationOutput) {
                 detectConfiguration.printConfiguration(System.out)
             }
             List<File> createdBdioFiles = bomToolManager.createBdioFiles()
             bdioUploader.uploadBdioFiles(createdBdioFiles)
-            hubSignatureScanner.scanFiles()
         }
     }
 

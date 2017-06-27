@@ -22,6 +22,8 @@
  */
 package com.blackducksoftware.integration.hub.detect.bomtool.pip
 
+import javax.annotation.PostConstruct
+
 import org.apache.commons.lang3.StringUtils
 import org.apache.commons.lang3.SystemUtils
 import org.slf4j.Logger
@@ -53,6 +55,7 @@ class VirtualEnvironmentHandler {
 
     String binFolderName
 
+    @PostConstruct
     void init() {
         systemEnvironment = new VirtualEnvironment()
         ExecutableType pipExecutableType

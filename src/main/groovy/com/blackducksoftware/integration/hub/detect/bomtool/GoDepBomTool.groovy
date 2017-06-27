@@ -42,12 +42,6 @@ class GoDepBomTool extends BomTool {
     public static final Forge GOLANG = new Forge("golang",":")
 
     @Autowired
-    GoGodepsBomTool goGodepsBomTool
-
-    @Autowired
-    GoVndrBomTool goVndrBomTool
-
-    @Autowired
     DepPackager goPackager
 
     List<String> matchingSourcePaths = []
@@ -64,11 +58,11 @@ class GoDepBomTool extends BomTool {
             logger.debug('Could not find Go on the environment PATH')
         }
         for (String sourcePath : detectConfiguration.getSourcePaths()) {
-            if (detectFileManager.containsAllFiles(sourcePath, 'Gopkg.lock')) {
-                matchingSourcePaths.add(sourcePath)
-            } else if (goGodepsBomTool.isApplicableToPath(sourcePath) || goVndrBomTool.isApplicableToPath(sourcePath)) {
+            if (detectFileManager.containsAllFiles(sourcePath, GoGodepsBomTool.FILE_SEARCH_PATTERN) || detectFileManager.containsAllFiles(sourcePath, GoVndrBomTool.FILE_SEARCH_PATTERN)) {
                 // not applicable, the other Go BomTools should be used for this path
                 continue
+            } else if (detectFileManager.containsAllFiles(sourcePath, 'Gopkg.lock')) {
+                matchingSourcePaths.add(sourcePath)
             } else if (detectFileManager.containsAllFilesToDepth(sourcePath, detectConfiguration.getSearchDepth(), '*.go')) {
                 matchingSourcePaths.add(sourcePath)
             }

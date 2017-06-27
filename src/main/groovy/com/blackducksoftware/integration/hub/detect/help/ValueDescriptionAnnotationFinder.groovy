@@ -22,6 +22,8 @@
  */
 package com.blackducksoftware.integration.hub.detect.help
 
+import javax.annotation.PostConstruct
+
 import org.apache.commons.lang3.StringUtils
 import org.apache.commons.lang3.math.NumberUtils
 import org.slf4j.Logger
@@ -41,12 +43,17 @@ public class ValueDescriptionAnnotationFinder implements ApplicationContextAware
 
     List<DetectOption> detectOptions
 
+    @PostConstruct
+    void init() {
+        gatherDetectValues()
+    }
+
     @Override
     public void setApplicationContext(final ApplicationContext applicationContext) throws BeansException {
         this.applicationContext = applicationContext
     }
 
-    public void init() {
+    public void gatherDetectValues() {
         Map<String, DetectOption> detectOptionsMap = [:]
         applicationContext.beanDefinitionNames.each { beanName ->
             final Object obj = applicationContext.getBean(beanName)
@@ -60,11 +67,9 @@ public class ValueDescriptionAnnotationFinder implements ApplicationContextAware
                     String description = ''
                     Class valueType = field.getType()
                     String defaultValue = ''
-                    String group = ''
                     final ValueDescription valueDescription = field.getAnnotation(ValueDescription.class)
                     description = valueDescription.description()
                     defaultValue = valueDescription.defaultValue()
-                    group = valueDescription.group()
                     if (!valueDescription.key()?.trim()) {
                         if (field.isAnnotationPresent(Value.class)) {
                             String valueKey = field.getAnnotation(Value.class).value().trim()
@@ -90,24 +95,14 @@ public class ValueDescriptionAnnotationFinder implements ApplicationContextAware
                         }
                     }
                     if (!detectOptionsMap.containsKey(key)) {
-                        detectOptionsMap.put(key, new DetectOption(key, description, valueType, defaultValue, group))
+                        detectOptionsMap.put(key, new DetectOption(key, description, valueType, defaultValue))
                     }
                 }
             }
         }
-
-        detectOptions = detectOptionsMap.values().toSorted(new Comparator<DetectOption>() {
-                    @Override
-                    public int compare(DetectOption o1, DetectOption o2) {
-                        if (o1.group.isEmpty()) {
-                            return 1
-                        } else if (o2.group.isEmpty()) {
-                            return -1
-                        } else {
-                            return o1.group.compareTo(o2.group)
-                        }
-                    }
-                })
+        detectOptions = detectOptionsMap.values().toSorted { a, b ->
+            a.key <=> b.key
+        }
     }
 
     public List<DetectOption> getDetectValues() {

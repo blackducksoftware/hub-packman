@@ -53,9 +53,6 @@ class GopkgLockParser {
                 if (!pack.equals('.')) {
                     packageName = "${packageName}/${pack}"
                 }
-                if (packageName.startsWith('golang.org/x/')) {
-                    packageName = packageName.replaceAll('golang.org/x/', '')
-                }
                 final ExternalId dependencyExternalId = new NameVersionExternalId(GoDepBomTool.GOLANG, packageName, version)
                 final DependencyNode dependency = new DependencyNode(packageName, version, dependencyExternalId)
                 nodes.add(dependency)

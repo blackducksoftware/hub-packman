@@ -91,10 +91,10 @@ class NpmCliDependencyFinder {
         JsonObject npmJson = new JsonParser().parse(new JsonReader(new FileReader(NpmLsOutFile))).getAsJsonObject()
 
         String projectName = npmJson.getAsJsonPrimitive(JSON_NAME)?.getAsString()
-        projectName = projectInfoGatherer.getProjectName(BomToolType.NPM, projectRootPath, projectName)
+        projectName = projectInfoGatherer.getDefaultProjectName(BomToolType.NPM, projectRootPath, projectName)
 
         String projectVersion = npmJson.getAsJsonPrimitive(JSON_VERSION)?.getAsString()
-        projectVersion = projectInfoGatherer.getProjectVersionName(projectVersion)
+        projectVersion = projectInfoGatherer.getDefaultProjectVersionName(projectVersion)
 
         def externalId = new NameVersionExternalId(Forge.NPM, projectName, projectVersion)
         def dependencyNode = new DependencyNode(projectName, projectVersion, externalId)

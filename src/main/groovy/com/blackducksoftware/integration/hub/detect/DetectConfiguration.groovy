@@ -69,8 +69,6 @@ class DetectConfiguration {
             ] as String[]
         }
 
-        //TODO check for source paths to be directories
-
         if (StringUtils.isBlank(detectProperties.outputDirectoryPath)) {
             usingDefaultOutputPath = true
             detectProperties.outputDirectoryPath = System.getProperty('user.home') + File.separator + 'blackduck'
@@ -170,14 +168,14 @@ class DetectConfiguration {
         printStream.println('')
     }
 
-    public boolean getCleanupBdioFiles() {
-        return toPrimitiveBoolean(detectProperties.cleanupBdioFiles)
+    public Boolean getCleanupBdioFiles() {
+        return detectProperties.cleanupBdioFiles
     }
     public String getHubUrl() {
         return detectProperties.hubUrl
     }
-    public int getHubTimeout() {
-        return toPrimitiveInteger(detectProperties.hubTimeout)
+    public Integer getHubTimeout() {
+        return detectProperties.hubTimeout
     }
     public String getHubUsername() {
         return detectProperties.hubUsername
@@ -197,8 +195,8 @@ class DetectConfiguration {
     public String getHubProxyPassword() {
         return detectProperties.hubProxyPassword
     }
-    public boolean getHubAutoImportCertificate() {
-        return toPrimitiveBoolean(detectProperties.hubAutoImportCertificate)
+    public Boolean getHubAutoImportCertificate() {
+        return detectProperties.hubAutoImportCertificate
     }
     public String[] getSourcePaths() {
         return detectProperties.sourcePaths
@@ -206,29 +204,26 @@ class DetectConfiguration {
     public String getOutputDirectoryPath() {
         return detectProperties.outputDirectoryPath
     }
-    public int getSearchDepth() {
-        return toPrimitiveInteger(detectProperties.searchDepth)
+    public Integer getSearchDepth() {
+        return detectProperties.searchDepth
     }
-    public String getExcludedBomToolTypes() {
-        return detectProperties.excludedBomToolTypes
-    }
-    public String getIncludedBomToolTypes() {
-        return detectProperties.includedBomToolTypes
+    public String getBomToolTypeOverride() {
+        return detectProperties.bomToolTypeOverride
     }
     public String getProjectName() {
-        return detectProperties.projectName?.trim()
+        return detectProperties.projectName
     }
     public String getProjectVersionName() {
-        return detectProperties.projectVersionName?.trim()
+        return detectProperties.projectVersionName
     }
     public String getProjectCodeLocationName() {
-        return detectProperties.projectCodeLocationName?.trim()
+        return detectProperties.projectCodeLocationName
     }
     public String getPolicyCheck() {
         return detectProperties.policyCheck
     }
-    public int getPolicyCheckTimeout() {
-        return toPrimitiveInteger(detectProperties.policyCheckTimeout)
+    public Integer getPolicyCheckTimeout() {
+        return detectProperties.policyCheckTimeout
     }
     public String getGradleInspectorVersion() {
         return detectProperties.gradleInspectorVersion
@@ -248,8 +243,8 @@ class DetectConfiguration {
     public String getGradleIncludedProjectNames() {
         return detectProperties.gradleIncludedProjectNames
     }
-    public boolean getGradleCleanupBuildBlackduckDirectory() {
-        return toPrimitiveBoolean(detectProperties.gradleCleanupBuildBlackduckDirectory)
+    public Boolean getGradleCleanupBuildBlackduckDirectory() {
+        return detectProperties.gradleCleanupBuildBlackduckDirectory
     }
     public String getNugetInspectorPackageName() {
         return detectProperties.nugetInspectorPackageName
@@ -260,11 +255,11 @@ class DetectConfiguration {
     public String getNugetInspectorExcludedModules() {
         return detectProperties.nugetInspectorExcludedModules
     }
-    public boolean getNugetInspectorIgnoreFailure() {
-        return toPrimitiveBoolean(detectProperties.nugetInspectorIgnoreFailure)
+    public Boolean getNugetInspectorIgnoreFailure() {
+        return detectProperties.nugetInspectorIgnoreFailure
     }
-    public boolean getMavenAggregateBom() {
-        return toPrimitiveBoolean(detectProperties.mavenAggregateBom)
+    public Boolean getMavenAggregateBom() {
+        return detectProperties.mavenAggregateBom
     }
     public String getMavenScope() {
         return detectProperties.mavenScope
@@ -275,23 +270,23 @@ class DetectConfiguration {
     public String getMavenPath() {
         return detectProperties.mavenPath
     }
-    public boolean getNugetAggregateBom() {
-        return toPrimitiveBoolean(detectProperties.nugetAggregateBom)
+    public Boolean getNugetAggregateBom() {
+        return detectProperties.nugetAggregateBom
     }
     public String getNugetPath() {
         return detectProperties.nugetPath
     }
     public String getNpmPath() {
-        return detectProperties.npmPath
+        return detectProperties.npmPath;
     }
     public String getPipProjectName() {
         return detectProperties.pipProjectName
     }
-    public boolean getCreateVirtualEnv() {
-        return toPrimitiveBoolean(detectProperties.createVirtualEnv)
+    public Boolean getCreateVirtualEnv() {
+        return detectProperties.createVirtualEnv
     }
-    public boolean getPipThreeOverride() {
-        return toPrimitiveBoolean(detectProperties.pipThreeOverride)
+    public Boolean getPipThreeOverride() {
+        return detectProperties.pipThreeOverride
     }
     public String getPythonPath() {
         return detectProperties.pythonPath
@@ -338,37 +333,7 @@ class DetectConfiguration {
     public String getCleanupBomToolFiles() {
         return detectProperties.cleanupBomToolFiles
     }
-    public boolean getSuppressConfigurationOutput() {
-        return toPrimitiveBoolean(detectProperties.suppressConfigurationOutput)
-    }
-    public String[] getHubSignatureScannerPaths() {
-        return detectProperties.hubSignatureScannerPaths
-    }
-    public int getHubSignatureScannerMemory() {
-        return toPrimitiveInteger(detectProperties.hubSignatureScannerMemory)
-    }
-
-    private int toPrimitiveInteger(Integer propertyValue) {
-        if (propertyValue) {
-            return propertyValue
-        }
-
-        0
-    }
-
-    private long toPrimitiveLong(Long propertyValue) {
-        if (propertyValue) {
-            return propertyValue
-        }
-
-        0L
-    }
-
-    private boolean toPrimitiveBoolean(Boolean propertyValue) {
-        if (propertyValue) {
-            return propertyValue
-        }
-
-        false
+    public Boolean getSuppressConfigurationOutput() {
+        return detectProperties.suppressConfigurationOutput
     }
 }

@@ -36,6 +36,8 @@ import com.blackducksoftware.integration.hub.detect.type.BomToolType
 class GoVndrBomTool extends BomTool {
     private final Logger logger = LoggerFactory.getLogger(GoVndrBomTool.class)
 
+    public static final String[] FILE_SEARCH_PATTERN = ['vendor.conf']
+
     List<String> matchingSourcePaths = []
 
     @Override
@@ -45,12 +47,8 @@ class GoVndrBomTool extends BomTool {
 
     @Override
     public boolean isBomToolApplicable() {
-        matchingSourcePaths = sourcePathSearcher.findFilenamePattern('vendor.conf')
+        matchingSourcePaths = sourcePathSearcher.findFilenamePattern(FILE_SEARCH_PATTERN)
         !matchingSourcePaths.isEmpty()
-    }
-
-    public boolean isApplicableToPath(String path) {
-        detectFileManager.containsAllFiles(path, 'vendor.conf')
     }
 
     @Override
@@ -60,8 +58,8 @@ class GoVndrBomTool extends BomTool {
         matchingSourcePaths.each {
             def vendorConf = new File(it, "vendor.conf")
             if (vendorConf.exists()) {
-                final String rootName = projectInfoGatherer.getProjectName(BomToolType.GO_VNDR, it)
-                final String rootVersion = projectInfoGatherer.getProjectVersionName()
+                final String rootName = projectInfoGatherer.getDefaultProjectName(BomToolType.GO_VNDR, it)
+                final String rootVersion = projectInfoGatherer.getDefaultProjectVersionName()
                 final ExternalId rootExternalId = new NameVersionExternalId(GoDepBomTool.GOLANG, rootName, rootVersion)
                 final DependencyNode projectNode = new DependencyNode(rootName, rootVersion, rootExternalId)
                 def children = vndrParser.parseVendorConf(vendorConf.text)
