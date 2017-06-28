@@ -1,4 +1,4 @@
-/**
+/*
  * Copyright (C) 2017 Black Duck Software, Inc.
  * http://www.blackducksoftware.com/
  *
@@ -20,23 +20,35 @@
  * specific language governing permissions and limitations
  * under the License.
  */
-package com.blackducksoftware.integration.hub.detect.type;
+package com.blackducksoftware.integration.hub.detect.bomtool.cran
 
-public enum BomToolType {
-    COCOAPODS,
-    DOCKER,
-    GRADLE,
-    MAVEN,
-    NUGET,
-    PIP,
-    PIP3,
-    RUBYGEMS,
-    CARTHAGE,
-    GO_GODEP,
-    GO_VNDR,
-    GO_DEP,
-    SBT,
-    NPM,
-    CRAN;
+import java.util.ArrayList
+import java.util.List
+import com.blackducksoftware.integration.hub.bdio.simple.model.DependencyNode;
+
+//import org.springframework.stereotype.Component
+
+//import com.esotericsoftware.yamlbeans.YamlException
+//import com.esotericsoftware.yamlbeans.YamlReader
+
+public class Node {
+	
+	private List<DependencyNode> _children = null;
+	private String _value;
+	
+	public Node(String value) {
+		this._children = new ArrayList<>();
+		this._value = value;
+		node = new DependencyNode();
+	}
+	
+	public void addChildren(Node child) {
+		_children.add(child);
+	}
+	
+	public Node getMostRecentNode() {
+		return _children.get(_children.size()-1);
+	}
+	
 	
 }

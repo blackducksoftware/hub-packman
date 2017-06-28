@@ -45,16 +45,15 @@ class NugetBomTool extends BomTool {
     @Autowired
     NugetInspectorPackager nugetInspectorPackager
 
-    File nugetExecutable
+    String nugetExecutablePath
     List<String> matchingSourcePaths = []
 
     BomToolType getBomToolType() {
         return BomToolType.NUGET
     }
 
-    @Override
-    public boolean isBomToolApplicable() {
-        nugetExecutable = findNugetExecutable()
+    boolean isBomToolApplicable() {
+        nugetExecutablePath = findNugetExecutable()
         detectConfiguration.sourcePaths.each { sourcePath ->
             def solutionFile = detectFileManager.findFile(sourcePath, SOLUTION_PATTERN)
             def projectFile = detectFileManager.findFile(sourcePath, PROJECT_PATTERN)
@@ -63,24 +62,23 @@ class NugetBomTool extends BomTool {
             }
         }
 
-        if (!matchingSourcePaths.isEmpty() && !nugetExecutable) {
+        if (!matchingSourcePaths.isEmpty() && !nugetExecutablePath) {
             logger.warn('The nuget executable must be on the path - are you sure you are running on a windows system?')
         }
 
-        nugetExecutable && !matchingSourcePaths.isEmpty()
+        nugetExecutablePath && !matchingSourcePaths.isEmpty()
     }
 
-    @Override
-    public List<DependencyNode> extractDependencyNodes() {
+    List<DependencyNode> extractDependencyNodes() {
         List<DependencyNode> projectNodes = []
         matchingSourcePaths.each { sourcePath ->
-            DependencyNode root = nugetInspectorPackager.makeDependencyNode(sourcePath, nugetExecutable)
+            DependencyNode root = nugetInspectorPackager.makeDependencyNode(sourcePath, nugetExecutablePath)
             if (!root) {
                 logger.info('Unable to extract any dependencies from nuget')
             } else {
                 if (isSolution(root)) {
-                    root.name = projectInfoGatherer.getProjectName(BomToolType.NUGET, sourcePath, root.name)
-                    root.version = projectInfoGatherer.getProjectVersionName(root.version)
+                    root.name = projectInfoGatherer.getDefaultProjectName(BomToolType.NUGET, sourcePath, root.name)
+                    root.version = projectInfoGatherer.getDefaultProjectVersionName(root.version)
                     root.externalId = new NameVersionExternalId(Forge.NUGET, root.name, root.version)
                     if (detectConfiguration.getNugetAggregateBom()) {
                         projectNodes.add(root)
@@ -88,8 +86,8 @@ class NugetBomTool extends BomTool {
                         projectNodes.addAll(root.children as List)
                     }
                 } else {
-                    root.name = projectInfoGatherer.getProjectName(BomToolType.NUGET, sourcePath, root.name)
-                    root.version = projectInfoGatherer.getProjectVersionName(root.version)
+                    root.name = projectInfoGatherer.getDefaultProjectName(BomToolType.NUGET, sourcePath, root.name)
+                    root.version = projectInfoGatherer.getDefaultProjectVersionName(root.version)
                     root.externalId = new NameVersionExternalId(Forge.NUGET, root.name, root.version)
                     projectNodes.add(root)
                 }
@@ -100,17 +98,7 @@ class NugetBomTool extends BomTool {
     }
 
     boolean isSolution(DependencyNode root) {
-        boolean isSolution = false
-        if (root.children != null && root.children.size() > 0) {
-            for (DependencyNode child : root.children) {
-                if (child.children != null && child.children.size() > 0) {
-                    // the only way to tell if we are dealing with a solution is if at least one of the projects has a dependency
-                    isSolution = true
-                    break
-                }
-            }
-        }
-        return isSolution
+        root.children != null && root.children.size() > 0 && root.children[0].children != null && root.children[0].children.size() > 0
     }
 
     private File findNugetExecutable() {

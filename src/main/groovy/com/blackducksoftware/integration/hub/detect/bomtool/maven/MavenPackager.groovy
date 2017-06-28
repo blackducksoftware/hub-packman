@@ -70,8 +70,8 @@ public class MavenPackager {
             }
             projects.clear()
             projects.add(firstNode)
-            firstNode.name = projectInfoGatherer.getProjectName(BomToolType.MAVEN, sourcePath, firstNode.name)
-            firstNode.version = projectInfoGatherer.getProjectVersionName(firstNode.version)
+            firstNode.name = projectInfoGatherer.getDefaultProjectName(BomToolType.MAVEN, sourcePath, firstNode.name)
+            firstNode.version = projectInfoGatherer.getDefaultProjectVersionName(firstNode.version)
         }
 
         return projects
