@@ -23,10 +23,13 @@
 package com.blackducksoftware.integration.hub.detect.bomtool
 
 import org.apache.commons.codec.digest.DigestUtils
+import org.slf4j.Logger
+import org.slf4j.LoggerFactory
 import org.springframework.beans.factory.annotation.Autowired
 
 import com.blackducksoftware.integration.hub.detect.DetectConfiguration
 import com.blackducksoftware.integration.hub.detect.bomtool.output.DetectCodeLocation
+import com.blackducksoftware.integration.hub.detect.bomtool.prerequisite.Prerequisite
 import com.blackducksoftware.integration.hub.detect.nameversion.NameVersionNodeTransformer
 import com.blackducksoftware.integration.hub.detect.type.BomToolType
 import com.blackducksoftware.integration.hub.detect.util.DetectFileManager
@@ -34,6 +37,8 @@ import com.blackducksoftware.integration.hub.detect.util.executable.ExecutableMa
 import com.blackducksoftware.integration.hub.detect.util.executable.ExecutableRunner
 
 abstract class BomTool {
+    private final Logger logger = LoggerFactory.getLogger(getClass())
+
     @Autowired
     DetectConfiguration detectConfiguration
 
@@ -50,14 +55,36 @@ abstract class BomTool {
     NameVersionNodeTransformer nameVersionNodeTransformer
 
     abstract BomToolType getBomToolType()
-    abstract boolean isBomToolApplicable()
+    abstract List<Prerequisite> getPrerequisites()
 
     /**
      * A BomTool is responsible for doing its best to create at least one, but possibly many, DetectCodeLocations.
      */
-    //    abstract List<DetectCodeLocation> extractDetectCodeLocations()
-    List<DetectCodeLocation> extractDetectCodeLocations() {
-        []
+    abstract List<DetectCodeLocation> extractDetectCodeLocations()
+
+    boolean isBomToolApplicable() {
+        List<Prerequisite> prerequisites = getPrerequisites()
+        int totalPrerequisites = prerequisites.size()
+        int metPrerequisites = 0
+        int metExecutablePrerequisites = 0
+        List<String> failureMessages = []
+        prerequisites.each {
+            if (it.isMet()) {
+                metPrerequisites++
+                if (it.isExecutablePrerequisite()) {
+                    metExecutablePrerequisites++
+                }
+            } else {
+                failureMessages.add(it.failureMessage())
+            }
+        }
+        if (metPrerequisites > metExecutablePrerequisites) {
+            if (metPrerequisites == totalPrerequisites) {
+                return true
+            }
+            logger.error("Some prerequisites for ${bomToolType.toString()} were not met: ${failureMessages.join(', ')}")
+        }
+        return false
     }
 
     String getSourcePath() {

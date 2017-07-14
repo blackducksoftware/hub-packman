@@ -31,6 +31,11 @@ import org.springframework.stereotype.Component
 import com.blackducksoftware.integration.hub.bdio.simple.model.DependencyNode
 import com.blackducksoftware.integration.hub.detect.bomtool.maven.MavenPackager
 import com.blackducksoftware.integration.hub.detect.bomtool.output.DetectCodeLocation
+import com.blackducksoftware.integration.hub.detect.bomtool.prerequisite.CompositePrerequisite
+import com.blackducksoftware.integration.hub.detect.bomtool.prerequisite.ExecutableExistsPrerequisite
+import com.blackducksoftware.integration.hub.detect.bomtool.prerequisite.Operator
+import com.blackducksoftware.integration.hub.detect.bomtool.prerequisite.Prerequisite
+import com.blackducksoftware.integration.hub.detect.bomtool.prerequisite.SourceFileExistsPrerequisite
 import com.blackducksoftware.integration.hub.detect.hub.HubSignatureScanner
 import com.blackducksoftware.integration.hub.detect.type.BomToolType
 import com.blackducksoftware.integration.hub.detect.type.ExecutableType
@@ -50,21 +55,28 @@ class MavenBomTool extends BomTool {
     @Autowired
     HubSignatureScanner hubSignatureScanner
 
-    private String mvnExecutable
-
     BomToolType getBomToolType() {
         return BomToolType.MAVEN
     }
 
-    boolean isBomToolApplicable() {
-        String pomXmlPath = detectFileManager.findFile(sourcePath, POM_FILENAME)
-        String pomWrapperPath = detectFileManager.findFile(sourcePath, POM_WRAPPER_FILENAME)
-        
-        if (pomXmlPath || pomWrapperPath) {
-            mvnExecutable = findMavenExecutablePath()
-        }
+    public List<Prerequisite> getPrerequisites() {
+        Prerequisite mvnWrapperExists = new ExecutableExistsPrerequisite(executableManager, ExecutableType.MVNW, detectConfiguration.getMavenPath())
+        Prerequisite mvnExists = new ExecutableExistsPrerequisite(executableManager, ExecutableType.MVN, detectConfiguration.getMavenPath())
+        Prerequisite mvnOrWrapperExist = new CompositePrerequisite(mvnExists, mvnWrapperExists, Operator.OR)
+        mvnOrWrapperExist.setExecutablePrerequisite(true)
 
-        mvnExecutable && (pomXmlPath || pomWrapperPath)
+        Prerequisite pomXmlExists = new SourceFileExistsPrerequisite(detectFileManager, detectConfiguration, POM_FILENAME)
+        Prerequisite pomGroovyExists = new SourceFileExistsPrerequisite(detectFileManager, detectConfiguration, POM_WRAPPER_FILENAME)
+        Prerequisite pomXmlSatisfied = new CompositePrerequisite(mvnExists, pomXmlExists, Operator.AND)
+        Prerequisite pomWrapperSatisfied = new CompositePrerequisite(mvnWrapperExists, pomGroovyExists, Operator.AND)
+        Prerequisite mavenSatisfied = new CompositePrerequisite(pomXmlSatisfied, pomWrapperSatisfied, Operator.OR)
+
+        def prerequisites = []
+
+        prerequisites.add(mavenSatisfied)
+        prerequisites.add(mvnOrWrapperExist)
+
+        prerequisites
     }
 
     List<DetectCodeLocation> extractDetectCodeLocations() {
@@ -74,7 +86,8 @@ class MavenBomTool extends BomTool {
         if (detectConfiguration.getMavenScope()?.trim()) {
             arguments.add("-Dscope=${detectConfiguration.getMavenScope()}")
         }
-        final Executable mvnExecutable = new Executable(detectConfiguration.sourceDirectory, mvnExecutable, arguments)
+        String mvnExecutablePath = findMavenExecutablePath()
+        final Executable mvnExecutable = new Executable(detectConfiguration.sourceDirectory, mvnExecutablePath, arguments)
         final ExecutableOutput mvnOutput = executableRunner.execute(mvnExecutable)
 
         List<DependencyNode> sourcePathProjectNodes = mavenPackager.makeDependencyNodes(mvnOutput.standardOutput)

@@ -32,6 +32,11 @@ import org.springframework.stereotype.Component
 
 import com.blackducksoftware.integration.hub.bdio.simple.model.DependencyNode
 import com.blackducksoftware.integration.hub.detect.bomtool.output.DetectCodeLocation
+import com.blackducksoftware.integration.hub.detect.bomtool.prerequisite.CompositePrerequisite
+import com.blackducksoftware.integration.hub.detect.bomtool.prerequisite.ExecutableExistsPrerequisite
+import com.blackducksoftware.integration.hub.detect.bomtool.prerequisite.Operator
+import com.blackducksoftware.integration.hub.detect.bomtool.prerequisite.Prerequisite
+import com.blackducksoftware.integration.hub.detect.bomtool.prerequisite.SourceFileExistsPrerequisite
 import com.blackducksoftware.integration.hub.detect.hub.HubSignatureScanner
 import com.blackducksoftware.integration.hub.detect.type.BomToolType
 import com.blackducksoftware.integration.hub.detect.type.ExecutableType
@@ -50,20 +55,22 @@ class GradleBomTool extends BomTool {
     @Autowired
     HubSignatureScanner hubSignatureScanner
 
-    private String gradleExecutable
-
     BomToolType getBomToolType() {
         return BomToolType.GRADLE
     }
 
-    boolean isBomToolApplicable() {
-        def buildGradle = detectFileManager.findFile(sourcePath, BUILD_GRADLE)
+    public List<Prerequisite> getPrerequisites() {
+        Prerequisite gradleWrapperExists = new ExecutableExistsPrerequisite(executableManager, ExecutableType.GRADLEW, detectConfiguration.getGradlePath())
+        Prerequisite gradleExists = new ExecutableExistsPrerequisite(executableManager, ExecutableType.GRADLE, detectConfiguration.getGradlePath())
+        Prerequisite gradleWrapperOrGradleExist = new CompositePrerequisite(gradleWrapperExists, gradleExists, Operator.OR)
+        gradleWrapperOrGradleExist.setExecutablePrerequisite(true)
 
-        if (buildGradle) {
-            gradleExecutable = findGradleExecutable(sourcePath)
-        }
+        def prerequisites = []
 
-        buildGradle && gradleExecutable
+        prerequisites.add(new SourceFileExistsPrerequisite(detectFileManager, detectConfiguration, BUILD_GRADLE))
+        prerequisites.add(gradleWrapperOrGradleExist)
+
+        prerequisites
     }
 
     List<DetectCodeLocation> extractDetectCodeLocations() {
@@ -79,21 +86,6 @@ class GradleBomTool extends BomTool {
         [detectCodeLocation]
     }
 
-    private String findGradleExecutable(String sourcePath) {
-        String gradlePath = detectConfiguration.getGradlePath()
-        if (StringUtils.isBlank(gradlePath)) {
-            logger.debug('detect.gradle.path not set in config - first try to find the gradle wrapper')
-            gradlePath = executableManager.getPathOfExecutable(ExecutableType.GRADLEW)
-        }
-
-        if (StringUtils.isBlank(gradlePath)) {
-            logger.debug('gradle wrapper not found - trying to find gradle on the PATH')
-            gradlePath = executableManager.getPathOfExecutable(ExecutableType.GRADLE)
-        }
-
-        gradlePath
-    }
-
     DependencyNode extractRootProjectNode() {
         File initScriptFile = detectFileManager.createFile(BomToolType.GRADLE, 'init-detect.gradle')
         String initScriptContents = getClass().getResourceAsStream('/init-script-gradle').getText(StandardCharsets.UTF_8.name())
@@ -106,6 +98,7 @@ class GradleBomTool extends BomTool {
         detectFileManager.writeToFile(initScriptFile, initScriptContents)
         String initScriptPath = initScriptFile.absolutePath
         logger.info("using ${initScriptPath} as the path for the gradle init script")
+        String gradleExecutable = findGradleExecutable()
         Executable executable = new Executable(sourceDirectory, gradleExecutable, [
             detectConfiguration.getGradleBuildCommand(),
             "--init-script=${initScriptPath}"
@@ -124,4 +117,20 @@ class GradleBomTool extends BomTool {
 
         rootProjectDependencyNode
     }
+
+    private String findGradleExecutable() {
+        String gradlePath = detectConfiguration.getGradlePath()
+        if (StringUtils.isBlank(gradlePath)) {
+            logger.debug('detect.gradle.path not set in config - first try to find the gradle wrapper')
+            gradlePath = executableManager.getPathOfExecutable(ExecutableType.GRADLEW)
+        }
+
+        if (StringUtils.isBlank(gradlePath)) {
+            logger.debug('gradle wrapper not found - trying to find gradle on the PATH')
+            gradlePath = executableManager.getPathOfExecutable(ExecutableType.GRADLE)
+        }
+
+        gradlePath
+    }
+
 }

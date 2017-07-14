@@ -31,6 +31,11 @@ import org.springframework.stereotype.Component
 
 import com.blackducksoftware.integration.hub.detect.bomtool.docker.DockerProperties
 import com.blackducksoftware.integration.hub.detect.bomtool.output.DetectCodeLocation
+import com.blackducksoftware.integration.hub.detect.bomtool.prerequisite.CompositePrerequisite
+import com.blackducksoftware.integration.hub.detect.bomtool.prerequisite.ExecutableExistsPrerequisite
+import com.blackducksoftware.integration.hub.detect.bomtool.prerequisite.Operator
+import com.blackducksoftware.integration.hub.detect.bomtool.prerequisite.Prerequisite
+import com.blackducksoftware.integration.hub.detect.bomtool.prerequisite.PropertyValueSetPrerequisite
 import com.blackducksoftware.integration.hub.detect.type.BomToolType
 import com.blackducksoftware.integration.hub.detect.type.ExecutableType
 import com.blackducksoftware.integration.hub.detect.util.executable.Executable
@@ -48,6 +53,26 @@ class DockerBomTool extends BomTool {
     @Override
     public BomToolType getBomToolType() {
         BomToolType.DOCKER
+    }
+
+    public List<Prerequisite> getPrerequisites() {
+        Prerequisite dockerInspectorVersionSet = new PropertyValueSetPrerequisite('detect.docker.inspector.version', detectConfiguration.dockerInspectorVersion)
+        Prerequisite dockerTarSet = new PropertyValueSetPrerequisite('detect.docker.tar', detectConfiguration.dockerTar)
+        Prerequisite dockerImageSet = new PropertyValueSetPrerequisite('detect.docker.image', detectConfiguration.dockerImage)
+        Prerequisite dockerExists = new ExecutableExistsPrerequisite(executableManager, ExecutableType.DOCKER, detectConfiguration.dockerPath)
+        Prerequisite bashExists = new ExecutableExistsPrerequisite(executableManager, ExecutableType.BASH, detectConfiguration.bashPath)
+
+        Prerequisite tarOrImageAreSet = new CompositePrerequisite(dockerTarSet, dockerImageSet, Operator.OR)
+        Prerequisite inspectorVersionAndTargetSet = new CompositePrerequisite(dockerInspectorVersionSet, tarOrImageAreSet, Operator.AND)
+        Prerequisite bothDockerAndBashExist = new CompositePrerequisite(dockerExists, bashExists, Operator.AND)
+        bothDockerAndBashExist.setExecutablePrerequisite(true)
+
+        def prerequisites = []
+
+        prerequisites.add(inspectorVersionAndTargetSet)
+        prerequisites.add(bothDockerAndBashExist)
+
+        prerequisites
     }
 
     @Override

@@ -31,6 +31,11 @@ import com.blackducksoftware.integration.hub.bdio.simple.model.externalid.Extern
 import com.blackducksoftware.integration.hub.bdio.simple.model.externalid.PathExternalId
 import com.blackducksoftware.integration.hub.detect.bomtool.cpan.CpanPackager
 import com.blackducksoftware.integration.hub.detect.bomtool.output.DetectCodeLocation
+import com.blackducksoftware.integration.hub.detect.bomtool.prerequisite.CompositePrerequisite
+import com.blackducksoftware.integration.hub.detect.bomtool.prerequisite.ExecutableExistsPrerequisite
+import com.blackducksoftware.integration.hub.detect.bomtool.prerequisite.Operator
+import com.blackducksoftware.integration.hub.detect.bomtool.prerequisite.Prerequisite
+import com.blackducksoftware.integration.hub.detect.bomtool.prerequisite.SourceFileExistsPrerequisite
 import com.blackducksoftware.integration.hub.detect.type.BomToolType
 import com.blackducksoftware.integration.hub.detect.type.ExecutableType
 import com.blackducksoftware.integration.hub.detect.util.executable.ExecutableOutput
@@ -40,28 +45,30 @@ class CpanBomTool extends BomTool {
     @Autowired
     CpanPackager cpanPackager
 
-    private String cpanExecutablePath
-    private String cpanmExecutablePath
-
     @Override
     public BomToolType getBomToolType() {
         BomToolType.CPAN
     }
 
-    @Override
-    public boolean isBomToolApplicable() {
-        def containsFiles = detectFileManager.containsAllFiles(sourcePath, 'cpanfile')
+    public List<Prerequisite> getPrerequisites() {
+        Prerequisite cpanExists = new ExecutableExistsPrerequisite(executableManager, ExecutableType.CPAN, detectConfiguration.getCpanPath())
+        Prerequisite cpanmExists = new ExecutableExistsPrerequisite(executableManager, ExecutableType.CPANM, detectConfiguration.getCpanmPath())
+        Prerequisite bothExist = new CompositePrerequisite(cpanExists, cpanmExists, Operator.AND)
+        bothExist.setExecutablePrerequisite(true)
 
-        if (containsFiles) {
-            cpanExecutablePath = executableManager.getPathOfExecutable(ExecutableType.CPAN, detectConfiguration.getCpanPath())
-            cpanmExecutablePath = executableManager.getPathOfExecutable(ExecutableType.CPANM, detectConfiguration.getCpanmPath())
-        }
+        def prerequisites = []
 
-        containsFiles && cpanExecutablePath && cpanmExecutablePath
+        prerequisites.add(new SourceFileExistsPrerequisite(detectFileManager, detectConfiguration, 'cpanfile'))
+        prerequisites.add(bothExist)
+
+        prerequisites
     }
 
     @Override
     public List<DetectCodeLocation> extractDetectCodeLocations() {
+        String cpanExecutablePath = executableManager.getPathOfExecutable(ExecutableType.CPAN, detectConfiguration.getCpanPath())
+        String cpanmExecutablePath = executableManager.getPathOfExecutable(ExecutableType.CPANM, detectConfiguration.getCpanmPath())
+
         ExecutableOutput cpanListOutput = executableRunner.runExe(cpanExecutablePath, '-l')
         String listText = cpanListOutput.getStandardOutput()
 

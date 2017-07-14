@@ -31,6 +31,8 @@ import com.blackducksoftware.integration.hub.bdio.simple.model.externalid.Extern
 import com.blackducksoftware.integration.hub.bdio.simple.model.externalid.PathExternalId
 import com.blackducksoftware.integration.hub.detect.bomtool.cocoapods.CocoapodsPackager
 import com.blackducksoftware.integration.hub.detect.bomtool.output.DetectCodeLocation
+import com.blackducksoftware.integration.hub.detect.bomtool.prerequisite.Prerequisite
+import com.blackducksoftware.integration.hub.detect.bomtool.prerequisite.SourceFileExistsPrerequisite
 import com.blackducksoftware.integration.hub.detect.type.BomToolType
 
 @Component
@@ -42,9 +44,10 @@ class CocoapodsBomTool extends BomTool {
         return BomToolType.COCOAPODS
     }
 
-    boolean isBomToolApplicable() {
-        boolean containsPodfile = detectFileManager.containsAllFiles(sourcePath, 'Podfile.lock')
-        containsPodfile
+    public List<Prerequisite> getPrerequisites() {
+        [
+            new SourceFileExistsPrerequisite(detectFileManager, detectConfiguration, 'Podfile.lock')
+        ]
     }
 
     List<DetectCodeLocation> extractDetectCodeLocations() {

@@ -29,6 +29,9 @@ import org.springframework.stereotype.Component
 
 import com.blackducksoftware.integration.hub.detect.bomtool.npm.NpmCliDependencyFinder
 import com.blackducksoftware.integration.hub.detect.bomtool.output.DetectCodeLocation
+import com.blackducksoftware.integration.hub.detect.bomtool.prerequisite.ExecutableExistsPrerequisite
+import com.blackducksoftware.integration.hub.detect.bomtool.prerequisite.Prerequisite
+import com.blackducksoftware.integration.hub.detect.bomtool.prerequisite.SourceFileExistsPrerequisite
 import com.blackducksoftware.integration.hub.detect.type.BomToolType
 import com.blackducksoftware.integration.hub.detect.type.ExecutableType
 
@@ -41,8 +44,6 @@ class NpmBomTool extends BomTool {
     public static final String OUTPUT_FILE = 'detect_npm_proj_dependencies.json'
     public static final String ERROR_FILE = 'detect_npm_error.json'
 
-    private String npmExePath
-
     @Autowired
     NpmCliDependencyFinder cliDependencyFinder
 
@@ -51,21 +52,19 @@ class NpmBomTool extends BomTool {
         BomToolType.NPM
     }
 
-    @Override
-    public boolean isBomToolApplicable() {
-        boolean containsNodeModules = detectFileManager.containsAllFiles(sourcePath, NODE_MODULES)
-        boolean containsPackageJson = detectFileManager.containsAllFiles(sourcePath, PACKAGE_JSON)
+    public List<Prerequisite> getPrerequisites() {
+        def prerequisites = []
 
-        if (containsPackageJson && !containsNodeModules) {
-            logger.warn("package.json was located in ${sourcePath}, but the node_modules folder was NOT located. Please run 'npm install' in that location and try again.")
-        } else if (containsPackageJson && containsNodeModules) {
-            npmExePath = executableManager.getPathOfExecutable(ExecutableType.NPM, detectConfiguration.getNpmPath())
-        }
+        prerequisites.add(new SourceFileExistsPrerequisite(detectFileManager, detectConfiguration, NODE_MODULES))
+        prerequisites.add(new SourceFileExistsPrerequisite(detectFileManager, detectConfiguration, PACKAGE_JSON))
+        prerequisites.add(new ExecutableExistsPrerequisite(executableManager, ExecutableType.NPM, detectConfiguration.getNpmPath()))
 
-        containsNodeModules && npmExePath
+        prerequisites
     }
 
     List<DetectCodeLocation> extractDetectCodeLocations() {
+        String npmExePath = executableManager.getPathOfExecutable(ExecutableType.NPM, detectConfiguration.getNpmPath())
+
         File npmLsOutputFile = detectFileManager.createFile(BomToolType.NPM, NpmBomTool.OUTPUT_FILE)
         File npmLsErrorFile = detectFileManager.createFile(BomToolType.NPM, NpmBomTool.ERROR_FILE)
         def npmExe = executableRunner.runExeToFile(npmExePath, npmLsOutputFile, npmLsErrorFile, 'ls', '-json')

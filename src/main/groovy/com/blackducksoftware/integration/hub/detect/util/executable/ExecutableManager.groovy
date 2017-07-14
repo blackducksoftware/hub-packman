@@ -61,11 +61,7 @@ class ExecutableManager {
     String getPathOfExecutable(ExecutableType executableType) {
         File executableFile = getExecutable(executableType)
 
-        if (executableFile == null) {
-            logger.info("Expected to find an executable of type ${executableType.toString()} but none was found")
-            return null
-        }
-        return executableFile.absolutePath
+        return executableFile?.absolutePath
     }
 
     String getPathOfExecutable(ExecutableType executableType, String defaultPath) {
