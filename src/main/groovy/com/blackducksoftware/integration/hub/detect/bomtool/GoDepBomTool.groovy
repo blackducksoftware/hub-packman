@@ -34,6 +34,13 @@ import com.blackducksoftware.integration.hub.bdio.simple.model.externalid.Extern
 import com.blackducksoftware.integration.hub.bdio.simple.model.externalid.PathExternalId
 import com.blackducksoftware.integration.hub.detect.bomtool.go.DepPackager
 import com.blackducksoftware.integration.hub.detect.bomtool.output.DetectCodeLocation
+import com.blackducksoftware.integration.hub.detect.bomtool.prerequisite.BooleanPrerequisite
+import com.blackducksoftware.integration.hub.detect.bomtool.prerequisite.CompositePrerequisite
+import com.blackducksoftware.integration.hub.detect.bomtool.prerequisite.ExecutableExistsPrerequisite
+import com.blackducksoftware.integration.hub.detect.bomtool.prerequisite.Operator
+import com.blackducksoftware.integration.hub.detect.bomtool.prerequisite.Prerequisite
+import com.blackducksoftware.integration.hub.detect.bomtool.prerequisite.SearchSourceFileExistsPrerequisite
+import com.blackducksoftware.integration.hub.detect.bomtool.prerequisite.SourceFileExistsPrerequisite
 import com.blackducksoftware.integration.hub.detect.type.BomToolType
 import com.blackducksoftware.integration.hub.detect.type.ExecutableType
 import com.blackducksoftware.integration.hub.detect.util.executable.Executable
@@ -43,6 +50,9 @@ class GoDepBomTool extends BomTool {
     private final Logger logger = LoggerFactory.getLogger(GoDepBomTool.class)
 
     public static final Forge GOLANG = new Forge("golang",":")
+
+    public static final String GO_PKG_LOCK_FILENAME = 'Gopkg.lock'
+    public static final String GO_FILE_PATTERN = '*.go'
 
     @Autowired
     GoGodepsBomTool goGodepsBomTool
@@ -59,23 +69,25 @@ class GoDepBomTool extends BomTool {
     }
 
     @Override
-    public boolean isBomToolApplicable() {
-        boolean isTheBestGoBomTool = false
-        if (detectFileManager.containsAllFiles(sourcePath, 'Gopkg.lock')) {
-            isTheBestGoBomTool = true
-        } else  {
-            boolean otherGoBomToolsWouldBeBetter = goGodepsBomTool.isBomToolApplicable() || goVndrBomTool.isBomToolApplicable()
-            if (!otherGoBomToolsWouldBeBetter && detectFileManager.containsAllFilesToDepth(sourcePath, detectConfiguration.getSearchDepth(), '*.go')) {
-                isTheBestGoBomTool = true
-            }
-        }
+    public List<Prerequisite> getPrerequisites() {
+        Prerequisite goExecutableExists = new ExecutableExistsPrerequisite(executableManager, ExecutableType.GO, null)
 
-        def goExecutablePath
-        if (isTheBestGoBomTool) {
-            goExecutablePath = executableManager.getPathOfExecutable(ExecutableType.GO)
-        }
+        Prerequisite goPkgLockExists = new SourceFileExistsPrerequisite(detectFileManager, detectConfiguration, GO_PKG_LOCK_FILENAME)
+        Prerequisite godepsNotApplicable = new BooleanPrerequisite(!goGodepsBomTool.isBomToolApplicable(), 'Godeps is applicable')
+        Prerequisite goVndrNotApplicable = new BooleanPrerequisite(!goVndrBomTool.isBomToolApplicable(), 'Vndr is applicable')
+        Prerequisite foundGoFiles = new SearchSourceFileExistsPrerequisite(detectFileManager, detectConfiguration, GO_FILE_PATTERN)
 
-        goExecutablePath && isTheBestGoBomTool
+        Prerequisite otherBomToolsNotBetter = new CompositePrerequisite(godepsNotApplicable, goVndrNotApplicable, Operator.OR)
+        Prerequisite isGoProjectAndOtherBomToolsNotApplicable = new CompositePrerequisite(otherBomToolsNotBetter, foundGoFiles, Operator.AND)
+
+        Prerequisite isTheBestBomTool = new CompositePrerequisite(goPkgLockExists, isGoProjectAndOtherBomToolsNotApplicable, Operator.OR)
+
+        def prerequisites = []
+
+        prerequisites.add(isTheBestBomTool)
+        prerequisites.add(goExecutableExists)
+
+        prerequisites
     }
 
     List<DetectCodeLocation> extractDetectCodeLocations() {

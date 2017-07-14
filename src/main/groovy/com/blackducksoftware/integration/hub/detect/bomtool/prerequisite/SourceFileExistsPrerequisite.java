@@ -5,7 +5,9 @@ import com.blackducksoftware.integration.hub.detect.util.DetectFileManager;
 
 public class SourceFileExistsPrerequisite extends Prerequisite {
     private final DetectFileManager detectFileManager;
+
     private final DetectConfiguration detectConfiguration;
+
     private final String filePath;
 
     public SourceFileExistsPrerequisite(final DetectFileManager detectFileManager, final DetectConfiguration detectConfiguration, final String filePath) {
@@ -24,4 +26,15 @@ public class SourceFileExistsPrerequisite extends Prerequisite {
         return String.format("Could not find the source file %s in %s.", filePath, detectConfiguration.getSourcePath());
     }
 
+    public DetectFileManager getDetectFileManager() {
+        return detectFileManager;
+    }
+
+    public DetectConfiguration getDetectConfiguration() {
+        return detectConfiguration;
+    }
+
+    public String getFilePath() {
+        return filePath;
+    }
 }
