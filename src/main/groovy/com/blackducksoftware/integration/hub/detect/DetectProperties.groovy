@@ -123,6 +123,18 @@ class DetectProperties {
     @Value('${detect.project.version.name}')
     String projectVersionName
 
+    @ValueDescription(description = "An override for the Project level matches.", defaultValue="true", group=DetectProperties.GROUP_PROJECT_INFO)
+    @Value('${detect.project.level.adjustments}')
+    String projectLevelMatchAdjustments
+
+    @ValueDescription(description = "An override for the Project Version phase.", defaultValue="Development",  group=DetectProperties.GROUP_PROJECT_INFO)
+    @Value('${detect.project.version.phase}')
+    String projectVersionPhase
+
+    @ValueDescription(description = "An override for the Project Version distribution", defaultValue="External",  group=DetectProperties.GROUP_PROJECT_INFO)
+    @Value('${detect.project.version.distribution}')
+    String projectVersionDistribution
+
     @ValueDescription(description = "Code location to use when sending data to the Hub. If the code location already exists, it will use that pre-existing location", group=DetectProperties.GROUP_PROJECT_INFO)
     @Value('${detect.project.code.location.name}')
     String projectCodeLocationName
@@ -284,7 +296,7 @@ class DetectProperties {
     Boolean cleanupBomToolFiles
 
     @ValueDescription(description="Enables you to specify sub-directories to exclude from scans", group=DetectProperties.GROUP_SIGNATURE_SCANNER)
-    @Value('${detect.hub.signature.scanner.exlusion.patterns}')
+    @Value('${detect.hub.signature.scanner.exclusion.patterns}')
     String[] hubSignatureScannerExclusionPatterns
 
     @ValueDescription(description="These paths and only these paths will be scanned.", group=DetectProperties.GROUP_SIGNATURE_SCANNER)
@@ -292,8 +304,8 @@ class DetectProperties {
     String[] hubSignatureScannerPaths
 
     @ValueDescription(description="The relative paths of directories to be excluded from scan registration", group=DetectProperties.GROUP_SIGNATURE_SCANNER)
-    @Value('${detect.scan.registration.exclusion.paths}')
-    String[] hubScanRegistrationExlusionPaths
+    @Value('${detect.hub.signature.scanner.relative.paths.to.exclude}')
+    String[] hubSignatureScannerRelativePathsToExclude
 
     @ValueDescription(description="The memory for the scanner to use.", defaultValue="4096", group=DetectProperties.GROUP_SIGNATURE_SCANNER)
     @Value('${detect.hub.signature.scanner.memory}')

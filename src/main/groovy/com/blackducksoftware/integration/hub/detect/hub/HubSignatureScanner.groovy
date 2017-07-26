@@ -60,14 +60,11 @@ class HubSignatureScanner {
     private List<String> registeredPaths = []
 
     public void registerPathToScan(File file) {
-        boolean excluded = false
-        for (String excludedPath : detectConfiguration.getHubScanRegistrationExlusionPaths()) {
-            if (file.canonicalPath.startsWith(excludedPath)) {
-                excluded = true
-                break
-            }
+        String matchingExcludedPath = detectConfiguration.hubSignatureScannerPathsToExclude.find {
+            file.canonicalPath.startsWith(it)
         }
-        if (excluded) {
+
+        if (matchingExcludedPath) {
             logger.info("Not registering excluded path ${file.canonicalPath} to scan")
         } else if (file.exists() && (file.isFile() || file.isDirectory())) {
             logger.info("Registering path ${file.canonicalPath} to scan")
@@ -99,10 +96,13 @@ class HubSignatureScanner {
 
     private void scanPath(CLIDataService cliDataService, HubServerConfig hubServerConfig, String canonicalPath, String project, String version) {
         try {
-            ProjectRequestBuilder projectRequestBuilder = new ProjectRequestBuilder()
-            projectRequestBuilder.projectName = project
-            projectRequestBuilder.versionName = version
-            ProjectRequest projectRequest = projectRequestBuilder.build()
+            ProjectRequestBuilder builder = new ProjectRequestBuilder()
+            builder.setProjectName(project)
+            builder.setVersionName(version)
+            builder.setProjectLevelAdjustments(detectConfiguration.getProjectLevelMatchAdjustments())
+            builder.setPhase(detectConfiguration.getProjectVersionPhase())
+            builder.setDistribution(detectConfiguration.getProjectVersionDistribution())
+            ProjectRequest projectRequest = builder.build()
 
             File scannerDirectory = detectFileManager.createDirectory('signature_scanner')
             File toolsDirectory = detectFileManager.createDirectory(scannerDirectory, 'tools')

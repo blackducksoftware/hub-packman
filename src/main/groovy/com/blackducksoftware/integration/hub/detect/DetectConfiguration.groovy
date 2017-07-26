@@ -109,8 +109,8 @@ class DetectConfiguration {
             configureForDocker()
         }
 
-        if (detectProperties.getHubScanRegistrationExlusionPaths()) {
-            detectProperties.getHubScanRegistrationExlusionPaths().each {
+        if (detectProperties.hubSignatureScannerRelativePathsToExclude) {
+            detectProperties.hubSignatureScannerRelativePathsToExclude.each {
                 excludedScanPaths.add(new File(sourceDirectory, it).getCanonicalPath())
             }
         }
@@ -244,6 +244,15 @@ class DetectConfiguration {
     public String getProjectVersionName() {
         return detectProperties.projectVersionName?.trim()
     }
+    public boolean getProjectLevelMatchAdjustments() {
+        return BooleanUtils.toBoolean(detectProperties.projectLevelMatchAdjustments)
+    }
+    public String getProjectVersionPhase() {
+        return detectProperties.projectVersionPhase?.trim()
+    }
+    public String getProjectVersionDistribution() {
+        return detectProperties.projectVersionDistribution?.trim()
+    }
     public String getProjectCodeLocationName() {
         return detectProperties.projectCodeLocationName?.trim()
     }
@@ -373,7 +382,7 @@ class DetectConfiguration {
     public String[] getHubSignatureScannerExclusionPatterns() {
         return detectProperties.hubSignatureScannerExclusionPatterns
     }
-    public List<String> getHubScanRegistrationExlusionPaths() {
+    public List<String> getHubSignatureScannerPathsToExclude() {
         return excludedScanPaths
     }
     public boolean getPackagistIncludeDevDependencies() {
