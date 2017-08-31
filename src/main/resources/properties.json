@@ -427,7 +427,7 @@
       "type": "String"
     }
   },
-  "signiture scanner": {
+  "signature scanner": {
     "detect.hub.signature.scanner.relative.paths.to.exclude": {
       "description": "The relative paths of directories to be excluded from scan registration",
       "defaultValue": "",
