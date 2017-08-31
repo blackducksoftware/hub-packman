@@ -182,11 +182,11 @@ task generateProperties {
 		println 'Generating properties'
 		MustacheFactory mf = new DefaultMustacheFactory()
 		JsonSlurper jsonSlurper = new JsonSlurper()
-		File propertiesJosnFile = new File("${projectDir}/src/main/resources/properties.json")
-		File applicationPropertiesTemplateFile = new File("${projectDir}/src/main/resources/mustache/application.properties.mustache")
-		File applicationPropertiesFile = new File("${projectDir}/src/main/resources/application.properties")
-		File detectPropertiesTemplateFile = new File("${projectDir}/src/main/resources/mustache/DetectProperties.groovy.mustache")
-		File detectPropertiesFile = new File("${projectDir}/src/main/groovy/com/blackducksoftware/integration/hub/detect/DetectProperties.groovy")
+		File propertiesJosnFile = new File("${projectDir}/src/main/resources/properties.json".replace('/', File.separator))
+		File applicationPropertiesTemplateFile = new File("${projectDir}/src/main/resources/mustache/application.properties.mustache".replace('/', File.separator))
+		File applicationPropertiesFile = new File("${projectDir}/src/main/resources/application.properties".replace('/', File.separator))
+		File detectPropertiesTemplateFile = new File("${projectDir}/src/main/resources/mustache/DetectProperties.groovy.mustache".replace('/', File.separator))
+		File detectPropertiesFile = new File("${projectDir}/src/main/groovy/com/blackducksoftware/integration/hub/detect/DetectProperties.groovy".replace('/', File.separator))
 		
 		def propertiesFile = new PropertiesFile()
 		def properties = jsonSlurper.parseText(propertiesJosnFile.getText(StandardCharsets.UTF_8.toString()))
@@ -196,7 +196,7 @@ task generateProperties {
 			propertyGroup.each { propertyName, jsonProprety ->
 				def property = new Property(jsonProprety)
 				property.name = propertyName
-				if(property.name.startsWith('logging')) {
+				if (property.name.startsWith('logging')) {
 					property.value = property.defaultValue
 				}
 				property.propertyVariableName = convertToVariableName(property.name)
