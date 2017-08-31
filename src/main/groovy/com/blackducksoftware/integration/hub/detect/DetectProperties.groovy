@@ -46,7 +46,7 @@ class DetectProperties {
     private static final String GROUP_NPM = 'npm'
     private static final String GROUP_NUGET = 'nuget'
     private static final String GROUP_PACKAGIST = 'packagist'
-    private static final String GROUP_PEAR = 'pear'
+    private static final String GROUP_PEAR = 'pear' 
     private static final String GROUP_PIP = 'pip'
     private static final String GROUP_POLICY_CHECK = 'policy check'
     private static final String GROUP_PROJECT_INFO = 'project info'

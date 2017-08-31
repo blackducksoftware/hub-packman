@@ -1,0 +1,451 @@
+{
+  "project info": {
+      "detect.bom.aggregate.name": {
+        "description": "If set, this will aggregate all the BOMs to create a single BDIO file with the name provided. For Co-Pilot use only",
+        "defaultValue": "",
+        "type": "String"
+      },
+      "detect.project.name": {
+        "description": "An override for the name to use for the Hub project. If not supplied, detect will attempt to use the tools to figure out a reasonable project name. If that fails, the final part of the directory path where the inspection is taking place will be used",
+        "defaultValue": "",
+        "type": "String"
+      },
+      "detect.project.level.adjustments": {
+        "description": "An override for the Project level matches",
+        "defaultValue": "true",
+        "defaultValue": "Boolean"
+      },
+      "detect.project.version.name": {
+        "description": "An override for the version to use for the Hub project. If not supplied, detect will attempt to use the tools to figure out a reasonable version name. If that fails, the current date will be used",
+        "defaultValue": "",
+        "type": "String"
+      },
+      "detect.project.version.phase": {
+        "description": "An override for the Project Version phase",
+        "defaultValue": "Development"
+      },
+      "detect.project.version.distribution": {
+        "description": "An override for the Project Version distribution",
+        "defaultValue": "External"
+      },
+      "detect.project.codelocation.prefix": {
+        "description": "A prefix to the name of the codelocations created by Detect. Useful for running against the same projects on multiple machines",
+        "defaultValue": "",
+        "type": "String"
+      },
+      "detect.default.project.version.scheme": {
+        "description": "The scheme to use when the package managers can not determine a version, either 'text' or 'timestamp'",
+        "defaultValue": "text"
+      },
+      "detect.default.project.version.text": {
+        "description": "The text to use as the default project version",
+        "defaultValue": "Detect Unkown Version"
+      },
+      "detect.default.project.version.timeformat": {
+        "description": "The timestamp format to use as the default project version",
+        "defaultValue": "yyyy-MM-dd'T'HH:mm:ss.SSS"
+      },
+      "detect.risk.report.pdf": {
+        "description": "When set to true, a Black Duck risk report in PDF form will be created",
+        "defaultValue": "false",
+        "defaultValue": "Boolean"
+      },
+      "detect.risk.report.pdf.path": {
+        "description": "The output directory for risk report in PDF. Default is the source directory",
+        "defaultValue": "."
+      },
+      "detect.notices.report": {
+        "description": "When set to true, a Black Duck notices report in text form will be created in your source directory",
+        "defaultValue": "false",
+        "defaultValue": "Boolean"
+      },
+      "detect.notices.report.path": {
+        "description": "The output directory for notices report. Default is the source directory",
+        "defaultValue": "."
+      },
+      "logging.pattern.console${LOG_LEVEL_PATTERN}%clr(---){faint} %m%n${LOG_EXCEPTION_CONVERSION_WORD:%wEx}": {
+        "description": "The logging level to run Detect at",
+        "defaultValue": "INFO",
+        "type": "String"
+      }
+  },
+  "hub configuration": {
+    "blackduck.hub.url": {
+      "description": "URL of the Hub server",
+      "defaultValue": "",
+        "type": "String"
+    },
+    "blackduck.hub.timeout": {
+      "description": "Time to wait for rest connections to complete",
+      "defaultValue": "120"
+    },
+    "blackduck.hub.username": {
+      "description": "Hub username",
+      "defaultValue": "",
+        "type": "String"
+    },
+    "blackduck.hub.password": {
+      "description": "Hub password",
+      "defaultValue": "",
+        "type": "String"
+    },
+    "blackduck.hub.auto.import.cert": {
+      "description": "If true the Hub https certificate will be automatically imported",
+      "defaultValue": "false",
+      "type": "Boolean"
+    },
+    "blackduck.hub.offline.mode": {
+      "description": "This can disable any Hub communication - if true, Detect will not upload BDIO files, it will not check policies, and it will not download and install the signature scanner",
+      "defaultValue": "false",
+      "type": "Boolean"
+    },
+    "blackduck.hub.proxy.host": {
+      "description": "Proxy host",
+      "defaultValue": "",
+        "type": "String"
+    },
+    "blackduck.hub.proxy.port": {
+      "description": "Proxy port",
+      "defaultValue": "",
+        "type": "String"
+    },
+    "blackduck.hub.proxy.username": {
+      "description": "Proxy username",
+      "defaultValue": "",
+        "type": "String"
+    },
+    "blackduck.hub.proxy.password": {
+      "description": "Project password",
+      "defaultValue": "",
+        "type": "String"
+    }
+  },
+  "logging": {
+    "detect.suppress.configuration.output": {
+      "description": "If true, the default behavior of printing your configuration properties at startup will be suppressed",
+      "defaultValue": "false",
+      "type": "Boolean"
+    },
+    "logging.level.com.blackducksoftware.integrationINFO": {
+      "description": "The logging level of Detect (ALL|TRACE|DEBUG|INFO|WARN|ERROR|FATAL|OFF)",
+      "defaultValue": "INFO"
+    }
+  },
+  "cleanup": {
+    "detect.cleanup.bom.tool.files": {
+      "description": "Detect creates temporary files in the output directory. If set to true this will clean them up after execution",
+      "defaultValue": "true",
+      "defaultValue": "Boolean"
+    },
+    "detect.cleanup.bdio.files": {
+      "description": "If true the bdio files will be deleted after upload",
+      "defaultValue": "true",
+      "defaultValue": "Boolean"
+    }
+  },
+  "paths": {
+    "detect.source.path": {
+      "description": "Source path to inspect",
+      "defaultValue": "",
+        "type": "String"
+    },
+    "detect.output.path": {
+      "description": "Output path",
+      "defaultValue": "",
+        "type": "String"
+    },
+    "detect.search.depth": {
+      "description": "Depth from source paths to search for files.",
+      "defaultValue": "3"
+    },
+    "detect.bash.path": {
+      "description": "Path of the bash executable",
+      "defaultValue": "",
+        "type": "String"
+    }
+  },
+  "bomtool": {
+    "detect.excluded.bom.tool.types": {
+      "description": "By default, all tools will be included. If you want to exclude specific tools, specify the ones to exclude here. Exclusion rules always win.",
+      "defaultValue": "",
+        "type": "String"
+    },
+    "detect.included.bom.tool.types": {
+      "description": "By default, all tools will be included. If you want to include only specific tools, specify the ones to include here. Exclusion rules always win.",
+      "defaultValue": "",
+        "type": "String"
+    }
+  },
+  "conda": {
+    "detect.conda.path": {
+      "description": "The path to the conda executable",
+      "defaultValue": "",
+        "type": "String"
+    },
+    "detect.conda.environment.name": {
+      "description": "The name of the anaconda environment used by your project",
+      "defaultValue": "",
+        "type": "String"
+    }
+  },
+  "cpan": {
+    "detect.cpan.path": {
+      "description": "The path to the cpan executable",
+      "defaultValue": "",
+        "type": "String"
+    },
+    "detect.cpanm.path": {
+      "description": "The path to the cpanm executable",
+      "defaultValue": "",
+        "type": "String"
+    },
+    "detect.perl.path": {
+      "description": "The path to the perl executable",
+      "defaultValue": "",
+        "type": "String"
+    }
+  },
+  "docker": {
+    "detect.docker.inspector.path": {
+      "description": "This is used to override using the hosted script by github url. You can provide your own script at this path",
+      "defaultValue": "",
+        "type": "String"
+    },
+    "detect.docker.inspector.version": {
+      "description": "Version of the Hub Docker Inspector to use",
+      "defaultValue": "latest"
+    },
+    "detect.docker.tar": {
+      "description": "A saved docker image - must be a .tar file. For detect to run docker either this property or detect.docker.image must be set",
+      "defaultValue": "",
+        "type": "String"
+    },
+    "detect.docker.image": {
+      "description": "The docker image name to inspect. For detect to run docker either this property or detect.docker.tar must be set",
+      "defaultValue": "",
+        "type": "String"
+    },
+    "detect.docker.path": {
+      "description": "The path to the docker executable",
+      "defaultValue": "",
+        "type": "String"
+    }
+  },
+  "go": {
+    "detect.go.dep.path": {
+      "description": "The path to the Go Dep executable",
+      "defaultValue": "",
+        "type": "String"
+    }
+  },
+  "gradle": {
+    "detect.gradle.inspector.version": {
+      "description": "Version of the Gradle Inspector",
+      "defaultValue": "0.2.1"
+    },
+    "detect.gradle.inspector.air.gap.path": {
+      "description": "The path to the directory containing the air gap dependencies for the gradle inspector",
+      "defaultValue": "",
+        "type": "String"
+    },
+    "detect.gradle.path": {
+      "description": "The path to the Gradle executable",
+      "defaultValue": "",
+        "type": "String"
+    },
+    "detect.gradle.build.command": {
+      "description": "Gradle build command",
+      "defaultValue": "dependencies"
+    },
+    "detect.gradle.excluded.configurations": {
+      "description": "The names of the dependency configurations to exclude",
+      "defaultValue": "",
+        "type": "String"
+    },
+    "detect.gradle.included.configurations": {
+      "description": "The names of the dependency configurations to include",
+      "defaultValue": "",
+        "type": "String"
+    },
+    "detect.gradle.excluded.projects": {
+      "description": "The names of the projects to exclude",
+      "defaultValue": "",
+        "type": "String"
+    },
+    "detect.gradle.included.projects": {
+      "description": "The names of the projects to include",
+      "defaultValue": "",
+        "type": "String"
+    },
+    "detect.gradle.cleanup.build.blackduck.directory": {
+      "description": "Set this to false if you do not want the 'blackduck' directory in your build directory to be deleted",
+      "defaultValue": "true",
+      "defaultValue": "Boolean"
+    }
+  },
+  "maven": {
+    "detect.maven.scope": {
+      "description": "The name of the dependency scope to include",
+      "defaultValue": "",
+        "type": "String"
+    },
+    "detect.maven.path": {
+      "description": "The path to the Maven executable",
+      "defaultValue": "",
+        "type": "String"
+    }
+  },
+  "npm": {
+    "detect.npm.path": {
+      "description": "The path to the Npm executable",
+      "defaultValue": "",
+        "type": "String"
+    }
+ },
+  "nuget": {
+    "detect.nuget.inspector.name": {
+      "description": "Name of the Nuget Inspector",
+      "defaultValue": "IntegrationNugetInspector"
+    },
+    "detect.nuget.inspector.version": {
+      "description": "Version of the Nuget Inspector",
+      "defaultValue": "2.0.0"
+    },
+    "detect.nuget.inspector.air.gap.path": {
+      "description": "The path to the nuget inspector nupkg file",
+      "defaultValue": "",
+        "type": "String"
+    },
+    "detect.nuget.packages.repo.url": {
+      "description": "The source for nuget packages",
+      "defaultValue": "https://www.nuget.org/api/v2/"
+    },
+    "detect.nuget.ignore.failure": {
+      "description": "If true errors will be logged and then ignored",
+      "defaultValue": "false",
+      "type": "Boolean"
+    },
+    "detect.nuget.excluded.modules": {
+      "description": "The names of the projects in a solution to exclude",
+      "defaultValue": "",
+        "type": "String"
+    },
+    "detect.nuget.path": {
+      "description": "The path to the Nuget executable",
+      "defaultValue": "",
+        "type": "String"
+    }
+  },
+  "packagist": {
+    "detect.packagist.include.dev.dependencies": {
+      "description": "Set this value to false if you would like to exclude your dev requires dependencies when ran",
+      "defaultValue": "true",
+      "defaultValue": "Boolean"
+    }
+  },
+  "pear": {
+    "detect.pear.path": {
+      "description": "The path to the Pear executable",
+      "defaultValue": "",
+        "type": "String"
+    },
+    "detect.pear.not.required.dependencies": {
+      "description": "Set to true if you would like to include the packages that are not required",
+      "defaultValue": "false",
+      "type": "Boolean"
+    }
+  },
+  "pip": {
+    "detect.python.path": {
+      "description": "The path to the python executable",
+      "defaultValue": "",
+        "type": "String"
+    },
+    "detect.pip.path": {
+      "description": "The path to the pip executable",
+      "defaultValue": "",
+        "type": "String"
+    },
+    "detect.pip.project.name": {
+      "description": "Override for pip inspector to find your project",
+      "defaultValue": "",
+        "type": "String"
+    },
+    "detect.pip.pip3": {
+      "description": "If true, detect will use pip3 if available on path",
+      "defaultValue": "false",
+      "type": "Boolean"
+    },
+    "detect.pip.requirements.path": {
+      "description": "The path to a requirements file",
+      "defaultValue": "",
+        "type": "String"
+    },
+    "detect.pip.virtualEnv.path": {
+      "description": "The path to a user's virtual environment",
+      "defaultValue": "",
+        "type": "String"
+    }
+  },
+  "policy check": {
+    "detect.policy.check": {
+      "description": "Set to true if you would like a policy check from the hub for your project",
+      "defaultValue": "false",
+      "type": "Boolean"
+    },
+    "detect.policy.check.timeout": {
+      "description": "Timeout for the Hub's policy check response. When changing this value, keep in mind the checking of policies might have to wait for a new scan to process which can take some time",
+      "defaultValue": "300000"
+    }
+  },
+  "sbt": {
+    "detect.sbt.excluded.configurations": {
+      "description": "The names of the sbt configurations to exclude",
+      "defaultValue": "",
+        "type": "String"
+    },
+    "detect.sbt.included.configurations": {
+      "description": "The names of the sbt configurations to include",
+      "defaultValue": "",
+        "type": "String"
+    }
+  },
+  "signiture scanner": {
+    "detect.hub.signature.scanner.relative.paths.to.exclude": {
+      "description": "The relative paths of directories to be excluded from scan registration",
+      "defaultValue": "",
+        "type": "String"
+    },
+    "detect.hub.signature.scanner.exclusion.patterns": {
+      "description": "Enables you to specify sub-directories to exclude from scans",
+      "defaultValue": "",
+        "type": "String"
+    },
+    "detect.hub.signature.scanner.paths": {
+      "description": "These paths and only these paths will be scanned",
+      "defaultValue": "",
+        "type": "String",
+      "type": "String[]"
+    },
+    "detect.hub.signature.scanner.memory": {
+      "description": "The memory for the scanner to use",
+      "defaultValue": "4096",
+      "type": "Integer"
+    },
+    "detect.hub.signature.scanner.disabled": {
+      "description": "Set to true to disable the Hub Signature Scanner",
+      "defaultValue": "false",
+      "type": "Boolean"
+    },
+    "detect.hub.signature.scanner.dry.run": {
+      "description": "If set to true, the signature scanner results will not be uploaded to the Hub and the scanner results will be written to disk",
+      "defaultValue": "false",
+      "type": "Boolean"
+    },
+    "detect.hub.signature.scanner.offline.local.path": {
+      "description": "To use a local signature scanner, set its location with this property. This will be the path that contains the 'Hub_Scan_Installation' directory where the signature scanner was unzipped",
+      "defaultValue": "",
+        "type": "String"
+    },
+  }
+}
