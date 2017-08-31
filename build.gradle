@@ -1,8 +1,11 @@
 import groovy.json.JsonBuilder
+import groovy.json.JsonSlurper
 
 import com.github.mustachejava.Mustache
 import com.github.mustachejava.DefaultMustacheFactory
 import com.github.mustachejava.MustacheFactory
+import java.io.PrintWriter;
+import java.nio.charset.StandardCharsets
 
 buildscript {
     repositories {
@@ -12,6 +15,7 @@ buildscript {
     dependencies {
         classpath 'org.springframework.boot:spring-boot-gradle-plugin:1.5.2.RELEASE'
         classpath 'org.kt3k.gradle.plugin:coveralls-gradle-plugin:2.8.1'
+		classpath 'com.github.spullara.mustache.java:compiler:0.8.18'
     }
 }
 
@@ -59,6 +63,8 @@ sourceCompatibility = 1.7
 targetCompatibility = 1.7
 
 build {
+	dependsOn 'generateProperties'
+	
     finalizedBy 'updateAirgapDependencies'
     
     doLast {
@@ -131,6 +137,7 @@ void fetchFile(File outputFile, String url) {
     new URL(url).withInputStream{ i -> outputFile.withOutputStream{ it << i }}
 }
 
+//////////// Air gap dependencies ////////////
 task cleanAirgapDependencies(type: Delete) {
     delete fileTree(gradleAirgapPath)
 }
@@ -150,3 +157,73 @@ task downloadNugetAirgapDependencies {
 task updateAirgapDependencies {
     dependsOn cleanAirgapDependencies, downloadGradleAirgapDependencies, downloadNugetAirgapDependencies
 }
+
+//////////// Propert file generation ////////////
+class PropertiesFile {
+	List<Group> groups = []
+}
+
+class Group {
+	String name
+	String groupVariableName
+	List<Property> properties = []
+}
+
+class Property {
+	String name
+	String propertyVariableName
+	String description
+	String defaultValue
+	String type = 'String'
+	String value
+}
+
+task generateProperties {
+		println 'Generating properties'
+		MustacheFactory mf = new DefaultMustacheFactory()
+		JsonSlurper jsonSlurper = new JsonSlurper()
+		File propertiesJosnFile = new File("${projectDir}/src/main/resources/properties.json".replace('/', File.separator))
+		File applicationPropertiesTemplateFile = new File("${projectDir}/src/main/resources/mustache/application.properties.mustache".replace('/', File.separator))
+		File applicationPropertiesFile = new File("${projectDir}/src/main/resources/application.properties".replace('/', File.separator))
+		File detectPropertiesTemplateFile = new File("${projectDir}/src/main/resources/mustache/DetectProperties.groovy.mustache".replace('/', File.separator))
+		File detectPropertiesFile = new File("${projectDir}/src/main/groovy/com/blackducksoftware/integration/hub/detect/DetectProperties.groovy".replace('/', File.separator))
+		
+		def propertiesFile = new PropertiesFile()
+		def properties = jsonSlurper.parseText(propertiesJosnFile.getText(StandardCharsets.UTF_8.toString()))
+		properties.each { groupName, propertyGroup ->
+			def group = new Group([name: groupName])
+			group.groupVariableName = "GROUP_${group.name.toUpperCase().replace(' ', '_')}"
+			propertyGroup.each { propertyName, jsonProprety ->
+				def property = new Property(jsonProprety)
+				property.name = propertyName
+				if (property.name.startsWith('logging')) {
+					property.value = property.defaultValue
+				}
+				property.propertyVariableName = convertToVariableName(property.name)
+				group.properties.add(property)
+			}
+			propertiesFile.groups.add(group)
+		}
+		
+		Mustache applicationPropertiesMustache = mf.compile(applicationPropertiesTemplateFile.getCanonicalPath())
+		applicationPropertiesMustache.execute(new FileWriter(applicationPropertiesFile), propertiesFile).flush();
+		
+		Mustache detectPropertiesMustace = mf.compile(detectPropertiesTemplateFile.getCanonicalPath())
+		detectPropertiesMustace.execute(new FileWriter(detectPropertiesFile), propertiesFile).flush();
+}
+
+private String convertToVariableName(String propertyName) {
+	if (!propertyName?.trim()) {
+		return null
+	}
+	List<String> segments = propertyName.split('\\.').collect{ it.capitalize() }
+	if (segments.isEmpty()) {
+		return null
+	}
+	segments.remove(0)
+	segments[0] = segments[0].toLowerCase()
+	
+	segments.join('')
+}
+
+

@@ -91,20 +91,20 @@ class DetectConfiguration {
         //make sure the path is absolute
         detectProperties.sourcePath = sourceDirectory.canonicalPath
 
-        if (StringUtils.isBlank(detectProperties.outputDirectoryPath)) {
+        if (StringUtils.isBlank(detectProperties.outputPath)) {
             usingDefaultOutputPath = true
-            detectProperties.outputDirectoryPath = System.getProperty('user.home') + File.separator + 'blackduck'
+            detectProperties.outputPath = System.getProperty('user.home') + File.separator + 'blackduck'
         }
 
-        detectProperties.nugetInspectorPackageName = detectProperties.nugetInspectorPackageName.trim()
-        detectProperties.nugetInspectorPackageVersion = detectProperties.nugetInspectorPackageVersion.trim()
+        detectProperties.nugetInspectorName = detectProperties.nugetInspectorName.trim()
+        detectProperties.nugetInspectorName = detectProperties.nugetInspectorName.trim()
 
-        outputDirectory = new File(detectProperties.outputDirectoryPath)
+        outputDirectory = new File(detectProperties.outputPath)
         outputDirectory.mkdirs()
         if (!outputDirectory.exists() || !outputDirectory.isDirectory()) {
-            throw new DetectException("The output directory ${detectProperties.outputDirectoryPath} does not exist. The system property 'user.home' will be used by default, but the output directory must exist.")
+            throw new DetectException("The output directory ${detectProperties.outputPath} does not exist. The system property 'user.home' will be used by default, but the output directory must exist.")
         }
-        detectProperties.outputDirectoryPath = detectProperties.outputDirectoryPath.trim()
+        detectProperties.outputPath = detectProperties.outputPath.trim()
 
         MutablePropertySources mutablePropertySources = configurableEnvironment.getPropertySources()
         mutablePropertySources.each { propertySource ->
@@ -225,13 +225,13 @@ class DetectConfiguration {
         return BooleanUtils.toBoolean(detectProperties.hubOfflineMode)
     }
     public boolean getHubAutoImportCertificate() {
-        return BooleanUtils.toBoolean(detectProperties.hubAutoImportCertificate)
+        return BooleanUtils.toBoolean(detectProperties.hubAutoImportCert)
     }
     public String getSourcePath() {
         return detectProperties.sourcePath
     }
-    public String getOutputDirectoryPath() {
-        return detectProperties.outputDirectoryPath
+    public String getoutputPath() {
+        return detectProperties.outputPath
     }
     public int getSearchDepth() {
         return convertInt(detectProperties.searchDepth)
@@ -249,10 +249,10 @@ class DetectConfiguration {
         return detectProperties.projectVersionName?.trim()
     }
     public String getProjectCodeLocationPrefix() {
-        return detectProperties.projectCodeLocationPrefix?.trim()
+        return detectProperties.projectCodelocationPrefix?.trim()
     }
     public boolean getProjectLevelMatchAdjustments() {
-        return BooleanUtils.toBoolean(detectProperties.projectLevelMatchAdjustments)
+        return BooleanUtils.toBoolean(detectProperties.projectLevelAdjustments)
     }
     public String getProjectVersionPhase() {
         return detectProperties.projectVersionPhase?.trim()
@@ -273,31 +273,31 @@ class DetectConfiguration {
         return detectProperties.gradleBuildCommand
     }
     public String getGradleExcludedConfigurationNames() {
-        return detectProperties.gradleExcludedConfigurationNames
+        return detectProperties.gradleExcludedConfigurations
     }
     public String getGradleIncludedConfigurationNames() {
-        return detectProperties.gradleIncludedConfigurationNames
+        return detectProperties.gradleIncludedConfigurations
     }
     public String getGradleExcludedProjectNames() {
-        return detectProperties.gradleExcludedProjectNames
+        return detectProperties.gradleExcludedProjects
     }
     public String getGradleIncludedProjectNames() {
-        return detectProperties.gradleIncludedProjectNames
+        return detectProperties.gradleIncludedProjects
     }
     public boolean getGradleCleanupBuildBlackduckDirectory() {
         return BooleanUtils.toBoolean(detectProperties.gradleCleanupBuildBlackduckDirectory)
     }
     public String getNugetInspectorPackageName() {
-        return detectProperties.nugetInspectorPackageName
+        return detectProperties.nugetInspectorName
     }
     public String getNugetInspectorPackageVersion() {
-        return detectProperties.nugetInspectorPackageVersion
+        return detectProperties.nugetInspectorVersion
     }
     public String getNugetInspectorExcludedModules() {
-        return detectProperties.nugetInspectorExcludedModules
+        return detectProperties.nugetExcludedModules
     }
     public boolean getNugetInspectorIgnoreFailure() {
-        return BooleanUtils.toBoolean(detectProperties.nugetInspectorIgnoreFailure)
+        return BooleanUtils.toBoolean(detectProperties.nugetIgnoreFailure)
     }
     public String getMavenScope() {
         return detectProperties.mavenScope
@@ -324,7 +324,7 @@ class DetectConfiguration {
         return detectProperties.pipProjectName
     }
     public boolean getPipThreeOverride() {
-        return BooleanUtils.toBoolean(detectProperties.pipThreeOverride)
+        return BooleanUtils.toBoolean(detectProperties.pipPip3)
     }
     public String getPythonPath() {
         return detectProperties.pythonPath
@@ -333,10 +333,10 @@ class DetectConfiguration {
         return detectProperties.pipPath
     }
     public String getVirtualEnvPath() {
-        return detectProperties.virtualEnvPath
+        return detectProperties.pipVirtualEnvPath
     }
     public String getRequirementsFilePath() {
-        return detectProperties.requirementsFilePath
+        return detectProperties.pipRequirementsPath
     }
     public String getGoDepPath() {
         return detectProperties.goDepPath
@@ -360,7 +360,7 @@ class DetectConfiguration {
         return detectProperties.bashPath
     }
     public String getLoggingLevel() {
-        return detectProperties.loggingLevel
+        return detectProperties.levelComBlackducksoftwareIntegration
     }
     public boolean getCleanupBomToolFiles() {
         return BooleanUtils.toBoolean(detectProperties.cleanupBomToolFiles)
@@ -402,10 +402,10 @@ class DetectConfiguration {
         return detectProperties.cpanmPath?.trim()
     }
     public String getSbtExcludedConfigurationNames() {
-        return detectProperties.sbtExcludedConfigurationNames
+        return detectProperties.sbtExcludedConfigurations
     }
     public String getSbtIncludedConfigurationNames() {
-        return detectProperties.sbtIncludedConfigurationNames
+        return detectProperties.sbtIncludedConfigurations
     }
     public String getDefaultProjectVersionScheme() {
         return detectProperties.defaultProjectVersionScheme?.trim()
@@ -417,7 +417,7 @@ class DetectConfiguration {
         return detectProperties.defaultProjectVersionTimeformat?.trim()
     }
     public String getAggregateBomName() {
-        return detectProperties.aggregateBomName?.trim()
+        return detectProperties.bomAggregateName?.trim()
     }
     public String getCondaPath() {
         return detectProperties.condaPath?.trim()
@@ -429,13 +429,13 @@ class DetectConfiguration {
         return detectProperties.riskReportPdf
     }
     public String getRiskReportPdfOutputDirectory() {
-        return detectProperties.riskReportPdfOutputDirectory
+        return detectProperties.riskReportPdfPath
     }
     public Boolean getNoticesReport() {
         return detectProperties.noticesReport
     }
     public String getNoticesReportOutputDirectory() {
-        return detectProperties.noticesReportOutputDirectory
+        return detectProperties.noticesReportPath
     }
     public String getGradleInspectorAirGapPath() {
         return detectProperties.gradleInspectorAirGapPath?.trim()
