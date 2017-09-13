@@ -91,20 +91,20 @@ class DetectConfiguration {
         //make sure the path is absolute
         detectProperties.sourcePath = sourceDirectory.canonicalPath
 
-        if (StringUtils.isBlank(detectProperties.outputDirectoryPath)) {
+        if (StringUtils.isBlank(detectProperties.outputPath)) {
             usingDefaultOutputPath = true
-            detectProperties.outputDirectoryPath = System.getProperty('user.home') + File.separator + 'blackduck'
+            detectProperties.outputPath = System.getProperty('user.home') + File.separator + 'blackduck'
         }
 
-        detectProperties.nugetInspectorPackageName = detectProperties.nugetInspectorPackageName.trim()
-        detectProperties.nugetInspectorPackageVersion = detectProperties.nugetInspectorPackageVersion.trim()
+        detectProperties.nugetInspectorName = detectProperties.nugetInspectorName.trim()
+        detectProperties.nugetInspectorVersion = detectProperties.nugetInspectorVersion.trim()
 
-        outputDirectory = new File(detectProperties.outputDirectoryPath)
+        outputDirectory = new File(detectProperties.outputPath)
         outputDirectory.mkdirs()
         if (!outputDirectory.exists() || !outputDirectory.isDirectory()) {
-            throw new DetectException("The output directory ${detectProperties.outputDirectoryPath} does not exist. The system property 'user.home' will be used by default, but the output directory must exist.")
+            throw new DetectException("The output directory ${detectProperties.outputPath} does not exist. The system property 'user.home' will be used by default, but the output directory must exist.")
         }
-        detectProperties.outputDirectoryPath = detectProperties.outputDirectoryPath.trim()
+        detectProperties.outputPath = detectProperties.outputPath.trim()
 
         MutablePropertySources mutablePropertySources = configurableEnvironment.getPropertySources()
         mutablePropertySources.each { propertySource ->
@@ -186,6 +186,10 @@ class DetectConfiguration {
         logger.info(configurationMessage)
     }
 
+    public List<String> getHubSignatureScannerPathsToExclude() {
+        return excludedScanPaths
+    }
+
     private int convertInt(Integer integerObj) {
         return integerObj == null ? 0 : integerObj.intValue()
     }
@@ -194,6 +198,14 @@ class DetectConfiguration {
         return longObj == null ? 0L : longObj.longValue()
     }
 
+    /**
+     * Don't delete this marker - it is so the code between the markers can be auto-generated.
+     * If changes to this code are needed, please make them in detectConfiguration.ftl and generate the code again.
+     */
+    //AUTO-GENERATE PROPERTIES START MARKER
+    public boolean getSuppressConfigurationOutput() {
+        return BooleanUtils.toBoolean(detectProperties.suppressConfigurationOutput)
+    }
     public boolean getCleanupBdioFiles() {
         return BooleanUtils.toBoolean(detectProperties.cleanupBdioFiles)
     }
@@ -201,49 +213,49 @@ class DetectConfiguration {
         return BooleanUtils.toBoolean(detectProperties.testConnection)
     }
     public String getHubUrl() {
-        return detectProperties.hubUrl
+        return detectProperties.hubUrl?.trim()
     }
     public int getHubTimeout() {
         return convertInt(detectProperties.hubTimeout)
     }
     public String getHubUsername() {
-        return detectProperties.hubUsername
+        return detectProperties.hubUsername?.trim()
     }
     public String getHubPassword() {
-        return detectProperties.hubPassword
+        return detectProperties.hubPassword?.trim()
     }
     public String getHubProxyHost() {
-        return detectProperties.hubProxyHost
+        return detectProperties.hubProxyHost?.trim()
     }
     public String getHubProxyPort() {
-        return detectProperties.hubProxyPort
+        return detectProperties.hubProxyPort?.trim()
     }
     public String getHubProxyUsername() {
-        return detectProperties.hubProxyUsername
+        return detectProperties.hubProxyUsername?.trim()
     }
     public String getHubProxyPassword() {
-        return detectProperties.hubProxyPassword
+        return detectProperties.hubProxyPassword?.trim()
+    }
+    public boolean getHubAutoImportCert() {
+        return BooleanUtils.toBoolean(detectProperties.hubAutoImportCert)
     }
     public boolean getHubOfflineMode() {
         return BooleanUtils.toBoolean(detectProperties.hubOfflineMode)
     }
-    public boolean getHubAutoImportCertificate() {
-        return BooleanUtils.toBoolean(detectProperties.hubAutoImportCertificate)
-    }
     public String getSourcePath() {
-        return detectProperties.sourcePath
+        return detectProperties.sourcePath?.trim()
     }
-    public String getOutputDirectoryPath() {
-        return detectProperties.outputDirectoryPath
+    public String getOutputPath() {
+        return detectProperties.outputPath?.trim()
     }
     public int getSearchDepth() {
         return convertInt(detectProperties.searchDepth)
     }
     public String getExcludedBomToolTypes() {
-        return detectProperties.excludedBomToolTypes?.toUpperCase()
+        return detectProperties.excludedBomToolTypes?.trim()
     }
     public String getIncludedBomToolTypes() {
-        return detectProperties.includedBomToolTypes?.toUpperCase()
+        return detectProperties.includedBomToolTypes?.trim()
     }
     public String getProjectName() {
         return detectProperties.projectName?.trim()
@@ -251,11 +263,11 @@ class DetectConfiguration {
     public String getProjectVersionName() {
         return detectProperties.projectVersionName?.trim()
     }
-    public String getProjectCodeLocationPrefix() {
-        return detectProperties.projectCodeLocationPrefix?.trim()
+    public String getProjectCodelocationPrefix() {
+        return detectProperties.projectCodelocationPrefix?.trim()
     }
-    public boolean getProjectLevelMatchAdjustments() {
-        return BooleanUtils.toBoolean(detectProperties.projectLevelMatchAdjustments)
+    public boolean getProjectLevelAdjustments() {
+        return BooleanUtils.toBoolean(detectProperties.projectLevelAdjustments)
     }
     public String getProjectVersionPhase() {
         return detectProperties.projectVersionPhase?.trim()
@@ -270,136 +282,127 @@ class DetectConfiguration {
         return convertLong(detectProperties.policyCheckTimeout)
     }
     public String getGradleInspectorVersion() {
-        return detectProperties.gradleInspectorVersion
+        return detectProperties.gradleInspectorVersion?.trim()
     }
     public String getGradleBuildCommand() {
-        return detectProperties.gradleBuildCommand
+        return detectProperties.gradleBuildCommand?.trim()
     }
-    public String getGradleExcludedConfigurationNames() {
-        return detectProperties.gradleExcludedConfigurationNames
+    public String getGradleExcludedConfigurations() {
+        return detectProperties.gradleExcludedConfigurations?.trim()
     }
-    public String getGradleIncludedConfigurationNames() {
-        return detectProperties.gradleIncludedConfigurationNames
+    public String getGradleIncludedConfigurations() {
+        return detectProperties.gradleIncludedConfigurations?.trim()
     }
-    public String getGradleExcludedProjectNames() {
-        return detectProperties.gradleExcludedProjectNames
+    public String getGradleExcludedProjects() {
+        return detectProperties.gradleExcludedProjects?.trim()
     }
-    public String getGradleIncludedProjectNames() {
-        return detectProperties.gradleIncludedProjectNames
+    public String getGradleIncludedProjects() {
+        return detectProperties.gradleIncludedProjects?.trim()
     }
     public boolean getGradleCleanupBuildBlackduckDirectory() {
         return BooleanUtils.toBoolean(detectProperties.gradleCleanupBuildBlackduckDirectory)
     }
-    public String getNugetInspectorPackageName() {
-        return detectProperties.nugetInspectorPackageName
+    public String getNugetInspectorName() {
+        return detectProperties.nugetInspectorName?.trim()
     }
-    public String getNugetInspectorPackageVersion() {
-        return detectProperties.nugetInspectorPackageVersion
+    public String getNugetInspectorVersion() {
+        return detectProperties.nugetInspectorVersion?.trim()
     }
-    public String getNugetInspectorExcludedModules() {
-        return detectProperties.nugetInspectorExcludedModules
+    public String getNugetExcludedModules() {
+        return detectProperties.nugetExcludedModules?.trim()
     }
-    public boolean getNugetInspectorIgnoreFailure() {
-        return BooleanUtils.toBoolean(detectProperties.nugetInspectorIgnoreFailure)
+    public boolean getNugetIgnoreFailure() {
+        return BooleanUtils.toBoolean(detectProperties.nugetIgnoreFailure)
     }
     public String getMavenScope() {
-        return detectProperties.mavenScope
+        return detectProperties.mavenScope?.trim()
     }
     public String getGradlePath() {
-        return detectProperties.gradlePath
+        return detectProperties.gradlePath?.trim()
     }
     public String getMavenPath() {
-        return detectProperties.mavenPath
+        return detectProperties.mavenPath?.trim()
     }
     public String getNugetPath() {
-        return detectProperties.nugetPath
+        return detectProperties.nugetPath?.trim()
+    }
+    public String getPipProjectName() {
+        return detectProperties.pipProjectName?.trim()
+    }
+    public boolean getPipPip3() {
+        return BooleanUtils.toBoolean(detectProperties.pipPip3)
+    }
+    public String getPythonPath() {
+        return detectProperties.pythonPath?.trim()
+    }
+    public String getPipPath() {
+        return detectProperties.pipPath?.trim()
     }
     public String getNpmPath() {
-        return detectProperties.npmPath
-    }
-    public boolean getNpmIncludeDevDependencies() {
-        return BooleanUtils.toBoolean(detectProperties.npmIncludeDevDependencies)
+        return detectProperties.npmPath?.trim()
     }
     public String getPearPath() {
-        return detectProperties.pearPath
+        return detectProperties.pearPath?.trim()
     }
     public boolean getPearNotRequiredDependencies() {
         return BooleanUtils.toBoolean(detectProperties.pearNotRequiredDependencies)
     }
-    public String getPipProjectName() {
-        return detectProperties.pipProjectName
+    public String getPipVirtualEnvPath() {
+        return detectProperties.pipVirtualEnvPath?.trim()
     }
-    public boolean getPipThreeOverride() {
-        return BooleanUtils.toBoolean(detectProperties.pipThreeOverride)
-    }
-    public String getPythonPath() {
-        return detectProperties.pythonPath
-    }
-    public String getPipPath() {
-        return detectProperties.pipPath
-    }
-    public String getVirtualEnvPath() {
-        return detectProperties.virtualEnvPath
-    }
-    public String getRequirementsFilePath() {
-        return detectProperties.requirementsFilePath
+    public String getPipRequirementsPath() {
+        return detectProperties.pipRequirementsPath?.trim()
     }
     public String getGoDepPath() {
-        return detectProperties.goDepPath
+        return detectProperties.goDepPath?.trim()
     }
     public String getDockerPath() {
-        return detectProperties.dockerPath
+        return detectProperties.dockerPath?.trim()
     }
     public String getDockerInspectorPath() {
-        return detectProperties.dockerInspectorPath
+        return detectProperties.dockerInspectorPath?.trim()
     }
     public String getDockerInspectorVersion() {
-        return detectProperties.dockerInspectorVersion
+        return detectProperties.dockerInspectorVersion?.trim()
     }
     public String getDockerTar() {
-        return detectProperties.dockerTar
+        return detectProperties.dockerTar?.trim()
     }
     public String getDockerImage() {
-        return detectProperties.dockerImage
+        return detectProperties.dockerImage?.trim()
     }
     public String getBashPath() {
-        return detectProperties.bashPath
+        return detectProperties.bashPath?.trim()
     }
     public String getLoggingLevel() {
-        return detectProperties.loggingLevel
+        return detectProperties.loggingLevel?.trim()
     }
     public boolean getCleanupBomToolFiles() {
         return BooleanUtils.toBoolean(detectProperties.cleanupBomToolFiles)
     }
-    public boolean getSuppressConfigurationOutput() {
-        return BooleanUtils.toBoolean(detectProperties.suppressConfigurationOutput)
-    }
-    public boolean getSuppressResultsOutput() {
-        return BooleanUtils.toBoolean(detectProperties.suppressResultsOutput)
-    }
     public boolean getHubSignatureScannerDryRun() {
-        return detectProperties.hubSignatureScannerDryRun
-    }
-    public String[] getHubSignatureScannerPaths() {
-        return detectProperties.hubSignatureScannerPaths
+        return BooleanUtils.toBoolean(detectProperties.hubSignatureScannerDryRun)
     }
     public String[] getHubSignatureScannerExclusionPatterns() {
         return detectProperties.hubSignatureScannerExclusionPatterns
     }
-    public List<String> getHubSignatureScannerPathsToExclude() {
-        return excludedScanPaths
+    public String[] getHubSignatureScannerPaths() {
+        return detectProperties.hubSignatureScannerPaths
     }
-    public String getHubSignatureScannerOfflineLocalPath() {
-        return detectProperties.hubSignatureScannerOfflineLocalPath
-    }
-    public boolean getPackagistIncludeDevDependencies() {
-        return BooleanUtils.toBoolean(detectProperties.packagistIncludeDevDependencies)
+    public String[] getHubSignatureScannerRelativePathsToExclude() {
+        return detectProperties.hubSignatureScannerRelativePathsToExclude
     }
     public int getHubSignatureScannerMemory() {
         return convertInt(detectProperties.hubSignatureScannerMemory)
     }
     public boolean getHubSignatureScannerDisabled() {
-        BooleanUtils.toBoolean(detectProperties.getHubSignatureScannerDisabled())
+        return BooleanUtils.toBoolean(detectProperties.hubSignatureScannerDisabled)
+    }
+    public String getHubSignatureScannerOfflineLocalPath() {
+        return detectProperties.hubSignatureScannerOfflineLocalPath?.trim()
+    }
+    public boolean getPackagistIncludeDevDependencies() {
+        return BooleanUtils.toBoolean(detectProperties.packagistIncludeDevDependencies)
     }
     public String getPerlPath() {
         return detectProperties.perlPath?.trim()
@@ -410,11 +413,11 @@ class DetectConfiguration {
     public String getCpanmPath() {
         return detectProperties.cpanmPath?.trim()
     }
-    public String getSbtExcludedConfigurationNames() {
-        return detectProperties.sbtExcludedConfigurationNames
+    public String getSbtExcludedConfigurations() {
+        return detectProperties.sbtExcludedConfigurations?.trim()
     }
-    public String getSbtIncludedConfigurationNames() {
-        return detectProperties.sbtIncludedConfigurationNames
+    public String getSbtIncludedConfigurations() {
+        return detectProperties.sbtIncludedConfigurations?.trim()
     }
     public String getDefaultProjectVersionScheme() {
         return detectProperties.defaultProjectVersionScheme?.trim()
@@ -425,8 +428,20 @@ class DetectConfiguration {
     public String getDefaultProjectVersionTimeformat() {
         return detectProperties.defaultProjectVersionTimeformat?.trim()
     }
-    public String getAggregateBomName() {
-        return detectProperties.aggregateBomName?.trim()
+    public String getBomAggregateName() {
+        return detectProperties.bomAggregateName?.trim()
+    }
+    public boolean getRiskReportPdf() {
+        return BooleanUtils.toBoolean(detectProperties.riskReportPdf)
+    }
+    public String getRiskReportPdfPath() {
+        return detectProperties.riskReportPdfPath?.trim()
+    }
+    public boolean getNoticesReport() {
+        return BooleanUtils.toBoolean(detectProperties.noticesReport)
+    }
+    public String getNoticesReportPath() {
+        return detectProperties.noticesReportPath?.trim()
     }
     public String getCondaPath() {
         return detectProperties.condaPath?.trim()
@@ -434,20 +449,11 @@ class DetectConfiguration {
     public String getCondaEnvironmentName() {
         return detectProperties.condaEnvironmentName?.trim()
     }
-    public Boolean getRiskReportPdf() {
-        return detectProperties.riskReportPdf
-    }
-    public String getRiskReportPdfOutputDirectory() {
-        return detectProperties.riskReportPdfOutputDirectory
-    }
-    public Boolean getNoticesReport() {
-        return detectProperties.noticesReport
-    }
-    public String getNoticesReportOutputDirectory() {
-        return detectProperties.noticesReportOutputDirectory
-    }
     public String getGradleInspectorAirGapPath() {
         return detectProperties.gradleInspectorAirGapPath?.trim()
+    }
+    public String getGradleInspectorRepositoryUrl() {
+        return detectProperties.gradleInspectorRepositoryUrl?.trim()
     }
     public String getNugetInspectorAirGapPath() {
         return detectProperties.nugetInspectorAirGapPath?.trim()
@@ -455,7 +461,11 @@ class DetectConfiguration {
     public String getNugetPackagesRepoUrl() {
         return detectProperties.nugetPackagesRepoUrl?.trim()
     }
-    public String getGradleInspectorRepositoryUrl() {
-        return detectProperties.gradleInspectorRepositoryUrl?.trim()
+    public boolean getNpmIncludeDevDependencies() {
+        return BooleanUtils.toBoolean(detectProperties.npmIncludeDevDependencies)
     }
+    public boolean getSuppressResultsOutput() {
+        return BooleanUtils.toBoolean(detectProperties.suppressResultsOutput)
+    }
+    //AUTO-GENERATE PROPERTIES END MARKER
 }

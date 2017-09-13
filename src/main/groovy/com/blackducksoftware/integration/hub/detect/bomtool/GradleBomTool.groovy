@@ -99,11 +99,12 @@ class GradleBomTool extends BomTool {
         File initScriptFile = detectFileManager.createFile(BomToolType.GRADLE, 'init-detect.gradle')
         final Map<String, String> model = [
             'gradleInspectorVersion' : detectConfiguration.getGradleInspectorVersion(),
-            'excludedProjectNames' : detectConfiguration.getGradleExcludedProjectNames(),
-            'includedProjectNames' : detectConfiguration.getGradleIncludedProjectNames(),
-            'excludedConfigurationNames' : detectConfiguration.getGradleExcludedConfigurationNames(),
-            'includedConfigurationNames' : detectConfiguration.getGradleIncludedConfigurationNames()
+            'excludedProjectNames' : detectConfiguration.getGradleExcludedProjects(),
+            'includedProjectNames' : detectConfiguration.getGradleIncludedProjects(),
+            'excludedConfigurationNames' : detectConfiguration.getGradleExcludedConfigurations(),
+            'includedConfigurationNames' : detectConfiguration.getGradleIncludedConfigurations()
         ]
+
         if (detectConfiguration.getGradleInspectorAirGapPath()) {
             model.put('airGapLibsPath', new File(detectConfiguration.getGradleInspectorAirGapPath()).getCanonicalPath())
         }

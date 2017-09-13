@@ -134,7 +134,7 @@ class HubSignatureScanner {
             ProjectRequestBuilder builder = new ProjectRequestBuilder()
             builder.setProjectName(detectProject.projectName)
             builder.setVersionName(detectProject.projectVersionName)
-            builder.setProjectLevelAdjustments(detectConfiguration.projectLevelMatchAdjustments)
+            builder.setProjectLevelAdjustments(detectConfiguration.getProjectLevelAdjustments())
             builder.setPhase(detectConfiguration.projectVersionPhase)
             builder.setDistribution(detectConfiguration.projectVersionDistribution)
             ProjectRequest projectRequest = builder.build()
@@ -184,7 +184,7 @@ class HubSignatureScanner {
         hubScanConfigBuilder.cleanupLogsOnSuccess = detectConfiguration.cleanupBomToolFiles
         hubScanConfigBuilder.dryRun = detectConfiguration.hubSignatureScannerDryRun
 
-        final String codeLocationName = detectProject.getCodeLocationName(detectConfiguration.sourcePath, canonicalPath, detectFileManager.extractFinalPieceFromPath(detectConfiguration.sourcePath), detectConfiguration.getProjectCodeLocationPrefix(), 'Hub Detect Scan')
+        final String codeLocationName = detectProject.getCodeLocationName(detectConfiguration.sourcePath, canonicalPath, detectFileManager.extractFinalPieceFromPath(detectConfiguration.sourcePath), detectConfiguration.getProjectCodelocationPrefix(), 'Hub Detect Scan')
         hubScanConfigBuilder.codeLocationAlias = codeLocationName
 
         if (detectConfiguration.hubSignatureScannerExclusionPatterns) {

@@ -74,6 +74,12 @@ build {
     }
 }
 
+task generateDetectProperties(type: com.blackducksoftware.integration.hub.detect.DetectPropertiesTask) {
+    doLast {
+        println 'running props task'
+    }
+}
+
 repositories {
     mavenLocal()
     mavenCentral()

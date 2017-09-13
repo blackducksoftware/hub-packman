@@ -83,10 +83,10 @@ class NugetBomTool extends BomTool {
         List<String> options =  [
             "--target_path=${sourcePath}" as String,
             "--output_directory=${outputDirectory.getAbsolutePath()}" as String,
-            "--ignore_failure=${detectConfiguration.getNugetInspectorIgnoreFailure()}" as String
+            "--ignore_failure=${detectConfiguration.getNugetIgnoreFailure()}" as String
         ]
-        if (detectConfiguration.getNugetInspectorExcludedModules()) {
-            options.add("--excluded_modules=${detectConfiguration.getNugetInspectorExcludedModules()}" as String)
+        if (detectConfiguration.getNugetExcludedModules()) {
+            options.add("--excluded_modules=${detectConfiguration.getNugetExcludedModules()}" as String)
         }
         if (detectConfiguration.getNugetPackagesRepoUrl()) {
             options.add("--packages_repo_url=${detectConfiguration.getNugetPackagesRepoUrl()}" as String)
@@ -117,13 +117,13 @@ class NugetBomTool extends BomTool {
     }
 
     private String installInspector(File sourceDirectory, File outputDirectory, String nugetExecutablePath) {
-        final File inspectorVersionDirectory = new File(outputDirectory, "${detectConfiguration.getNugetInspectorPackageName()}.${detectConfiguration.getNugetInspectorPackageVersion()}")
+        final File inspectorVersionDirectory = new File(outputDirectory, "${detectConfiguration.getNugetInspectorName()}.${detectConfiguration.getNugetInspectorVersion()}")
         final File toolsDirectory = new File(inspectorVersionDirectory, 'tools')
-        final File inspectorExe = new File(toolsDirectory, "${detectConfiguration.getNugetInspectorPackageName()}.exe")
+        final File inspectorExe = new File(toolsDirectory, "${detectConfiguration.getNugetInspectorName()}.exe")
 
         final def nugetOptions = [
             'install',
-            detectConfiguration.getNugetInspectorPackageName(),
+            detectConfiguration.getNugetInspectorName(),
             '-OutputDirectory',
             outputDirectory.getCanonicalPath()
         ]
@@ -139,7 +139,7 @@ class NugetBomTool extends BomTool {
             logger.debug('Running online. Resolving through nuget')
             nugetOptions.addAll([
                 '-Version',
-                detectConfiguration.getNugetInspectorPackageVersion(),
+                detectConfiguration.getNugetInspectorVersion(),
                 '-Source',
                 detectConfiguration.getNugetPackagesRepoUrl()
             ])
@@ -153,7 +153,7 @@ class NugetBomTool extends BomTool {
         }
 
         if (!inspectorExe.exists()) {
-            logger.warn("Could not find the ${detectConfiguration.getNugetInspectorPackageName()} version:${detectConfiguration.getNugetInspectorPackageVersion()} even after an install attempt.")
+            logger.warn("Could not find the ${detectConfiguration.getNugetInspectorName()} version:${detectConfiguration.getNugetInspectorVersion()} even after an install attempt.")
             return null
         }
 

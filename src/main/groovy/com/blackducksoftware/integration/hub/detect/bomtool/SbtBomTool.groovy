@@ -71,8 +71,8 @@ class SbtBomTool extends BomTool {
     }
 
     List<DetectCodeLocation> extractDetectCodeLocations() {
-        String included = detectConfiguration.getSbtIncludedConfigurationNames()
-        String excluded = detectConfiguration.getSbtExcludedConfigurationNames()
+        String included = detectConfiguration.getSbtIncludedConfigurations()
+        String excluded = detectConfiguration.getSbtExcludedConfigurations()
 
         int depth = detectConfiguration.getSearchDepth()
 

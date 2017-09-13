@@ -59,7 +59,7 @@ class PipBomTool extends BomTool {
 
     boolean isBomToolApplicable() {
         def containsFiles = detectFileManager.containsAllFiles(sourcePath, SETUP_FILE_NAME)
-        def definedRequirements = detectConfiguration.requirementsFilePath
+        def definedRequirements = detectConfiguration.pipRequirementsPath
 
         def foundExecutables
         if (containsFiles || definedRequirements) {
@@ -81,7 +81,7 @@ class PipBomTool extends BomTool {
         def outputDirectory = detectFileManager.createDirectory(BomToolType.PIP)
         def sourcePath = sourcePath
 
-        PythonEnvironment pythonEnvironment = virtualEnvironmentHandler.getEnvironment(detectConfiguration.virtualEnvPath)
+        PythonEnvironment pythonEnvironment = virtualEnvironmentHandler.getEnvironment(detectConfiguration.pipVirtualEnvPath)
         DependencyNode projectNode = makeDependencyNode(pythonEnvironment)
         def codeLocation = new DetectCodeLocation(BomToolType.PIP, sourcePath, projectNode)
 
@@ -101,8 +101,8 @@ class PipBomTool extends BomTool {
         ]
 
         // Install requirements file and add it as an option for the inspector
-        if (detectConfiguration.requirementsFilePath) {
-            def requirementsFile = new File(detectConfiguration.requirementsFilePath)
+        if (detectConfiguration.pipRequirementsPath) {
+            def requirementsFile = new File(detectConfiguration.pipRequirementsPath)
             pipInspectorOptions.add("--requirements=${requirementsFile.absolutePath}" as String)
         }
 

@@ -54,7 +54,7 @@ class PythonEnvironmentHandler {
         ExecutableType pipExecutableType
         ExecutableType pythonExecutableType
 
-        if (detectConfiguration.getPipThreeOverride()) {
+        if (detectConfiguration.getPipPip3()) {
             pythonExecutableType = ExecutableType.PYTHON3
             pipExecutableType = ExecutableType.PIP3
         } else {

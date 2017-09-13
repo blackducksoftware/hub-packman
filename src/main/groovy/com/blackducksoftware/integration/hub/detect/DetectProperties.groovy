@@ -27,40 +27,38 @@ import org.springframework.stereotype.Component
 
 import com.blackducksoftware.integration.hub.detect.help.ValueDescription
 
-import groovy.transform.TypeChecked
-
 @Component
-@TypeChecked
 class DetectProperties {
-    private static final String GROUP_HUB_CONFIGURATION = 'hub configuration'
+    /**
+     * This class is generated from the src/main/resources/detectProperties.ftl file.
+     * Any necessary changes should be made there and then this class should be generated from the template.
+     */
+
     private static final String GROUP_LOGGING = 'logging'
     private static final String GROUP_CLEANUP = 'cleanup'
+    private static final String GROUP_HUB_CONFIGURATION = 'hub configuration'
     private static final String GROUP_PATHS = 'paths'
     private static final String GROUP_BOMTOOL = 'bomtool'
-    private static final String GROUP_CONDA = 'conda'
-    private static final String GROUP_CPAN = 'cpan'
-    private static final String GROUP_DOCKER = 'docker'
-    private static final String GROUP_GO = 'go'
-    private static final String GROUP_GRADLE = 'gradle'
-    private static final String GROUP_MAVEN = 'maven'
-    private static final String GROUP_NPM = 'npm'
-    private static final String GROUP_NUGET = 'nuget'
-    private static final String GROUP_PACKAGIST = 'packagist'
-    private static final String GROUP_PEAR = 'pear'
-    private static final String GROUP_PIP = 'pip'
-    private static final String GROUP_POLICY_CHECK = 'policy check'
     private static final String GROUP_PROJECT_INFO = 'project info'
+    private static final String GROUP_POLICY_CHECK = 'policy check'
+    private static final String GROUP_GRADLE = 'gradle'
+    private static final String GROUP_NUGET = 'nuget'
+    private static final String GROUP_MAVEN = 'maven'
+    private static final String GROUP_PIP = 'pip'
     private static final String GROUP_PYTHON = 'python'
-    private static final String GROUP_SBT = 'sbt'
+    private static final String GROUP_NPM = 'npm'
+    private static final String GROUP_PEAR = 'pear'
+    private static final String GROUP_GO = 'go'
+    private static final String GROUP_DOCKER = 'docker'
     private static final String GROUP_SIGNATURE_SCANNER = 'signature scanner'
+    private static final String GROUP_PACKAGIST = 'packagist'
+    private static final String GROUP_CPAN = 'cpan'
+    private static final String GROUP_SBT = 'sbt'
+    private static final String GROUP_CONDA = 'conda'
 
     @ValueDescription(description="If true, the default behavior of printing your configuration properties at startup will be suppressed.", defaultValue="false", group=DetectProperties.GROUP_LOGGING)
     @Value('${detect.suppress.configuration.output}')
     Boolean suppressConfigurationOutput
-
-    @ValueDescription(description="If true, the default behavior of printing the Detect Results will be suppressed.", defaultValue="false", group=DetectProperties.GROUP_LOGGING)
-    @Value('${detect.suppress.results.output}')
-    Boolean suppressResultsOutput
 
     @ValueDescription(description="If true the bdio files will be deleted after upload", defaultValue="true", group=DetectProperties.GROUP_CLEANUP)
     @Value('${detect.cleanup.bdio.files}')
@@ -104,65 +102,53 @@ class DetectProperties {
 
     @ValueDescription(description="If true the Hub https certificate will be automatically imported", defaultValue="false", group=DetectProperties.GROUP_HUB_CONFIGURATION)
     @Value('${blackduck.hub.auto.import.cert}')
-    Boolean hubAutoImportCertificate
+    Boolean hubAutoImportCert
 
     @ValueDescription(description="This can disable any Hub communication - if true, Detect will not upload BDIO files, it will not check policies, and it will not download and install the signature scanner.", defaultValue="false", group=DetectProperties.GROUP_HUB_CONFIGURATION)
     @Value('${blackduck.hub.offline.mode}')
     Boolean hubOfflineMode
 
-    @ValueDescription(description = "Source path to inspect", group=DetectProperties.GROUP_PATHS)
     @Value('${detect.source.path}')
     String sourcePath
 
-    @ValueDescription(description = "Output path", group=DetectProperties.GROUP_PATHS)
     @Value('${detect.output.path}')
-    String outputDirectoryPath
+    String outputPath
 
-    @ValueDescription(description = "Depth from source paths to search for files.", defaultValue="3", group=DetectProperties.GROUP_PATHS)
     @Value('${detect.search.depth}')
     Integer searchDepth
 
-    @ValueDescription(description = "By default, all tools will be included. If you want to exclude specific tools, specify the ones to exclude here. Exclusion rules always win.", group=DetectProperties.GROUP_BOMTOOL)
     @Value('${detect.excluded.bom.tool.types}')
     String excludedBomToolTypes
 
-    @ValueDescription(description = "By default, all tools will be included. If you want to include only specific tools, specify the ones to include here. Exclusion rules always win.", group=DetectProperties.GROUP_BOMTOOL)
     @Value('${detect.included.bom.tool.types}')
     String includedBomToolTypes
 
-    @ValueDescription(description = "An override for the name to use for the Hub project. If not supplied, detect will attempt to use the tools to figure out a reasonable project name. If that fails, the final part of the directory path where the inspection is taking place will be used.", group=DetectProperties.GROUP_PROJECT_INFO)
     @Value('${detect.project.name}')
     String projectName
 
-    @ValueDescription(description = "An override for the version to use for the Hub project. If not supplied, detect will attempt to use the tools to figure out a reasonable version name. If that fails, the current date will be used.", group=DetectProperties.GROUP_PROJECT_INFO)
     @Value('${detect.project.version.name}')
     String projectVersionName
 
-    @ValueDescription(description = "A prefix to the name of the codelocations created by Detect. Useful for running against the same projects on multiple machines.", defaultValue='', group=DetectProperties.GROUP_PROJECT_INFO)
     @Value('${detect.project.codelocation.prefix}')
-    String projectCodeLocationPrefix
+    String projectCodelocationPrefix
 
-    @ValueDescription(description = "An override for the Project level matches.", defaultValue="true", group=DetectProperties.GROUP_PROJECT_INFO)
     @Value('${detect.project.level.adjustments}')
-    String projectLevelMatchAdjustments
+    Boolean projectLevelAdjustments
 
-    @ValueDescription(description = "An override for the Project Version phase.", defaultValue="Development",  group=DetectProperties.GROUP_PROJECT_INFO)
     @Value('${detect.project.version.phase}')
     String projectVersionPhase
 
-    @ValueDescription(description = "An override for the Project Version distribution", defaultValue="External",  group=DetectProperties.GROUP_PROJECT_INFO)
     @Value('${detect.project.version.distribution}')
     String projectVersionDistribution
 
-    @ValueDescription(description = "Set to true if you would like a policy check from the hub for your project. False by default", defaultValue="false", group=DetectProperties.GROUP_POLICY_CHECK)
     @Value('${detect.policy.check}')
     Boolean policyCheck
 
-    @ValueDescription(description="Timeout for response from the hub regarding your project (i.e. risk reports and policy check). When changing this value, keep in mind the checking of policies might have to wait for a new scan to process which can take some time.", defaultValue="300000", group=DetectProperties.GROUP_POLICY_CHECK)
+    @ValueDescription(description="Timeout for the Hub's policy check response. When changing this value, keep in mind the checking of policies might have to wait for a new scan to process which can take some time.", defaultValue="300000", group=DetectProperties.GROUP_POLICY_CHECK)
     @Value('${detect.policy.check.timeout}')
     Long policyCheckTimeout
 
-    @ValueDescription(description="Version of the Gradle Inspector", defaultValue="0.2.2", group=DetectProperties.GROUP_GRADLE)
+    @ValueDescription(description="Version of the Gradle Inspector", defaultValue="0.2.1", group=DetectProperties.GROUP_GRADLE)
     @Value('${detect.gradle.inspector.version}')
     String gradleInspectorVersion
 
@@ -172,19 +158,19 @@ class DetectProperties {
 
     @ValueDescription(description="The names of the dependency configurations to exclude", group=DetectProperties.GROUP_GRADLE)
     @Value('${detect.gradle.excluded.configurations}')
-    String gradleExcludedConfigurationNames
+    String gradleExcludedConfigurations
 
-    @ValueDescription( description="The names of the dependency configurations to include", group=DetectProperties.GROUP_GRADLE)
+    @ValueDescription(description="The names of the dependency configurations to include", group=DetectProperties.GROUP_GRADLE)
     @Value('${detect.gradle.included.configurations}')
-    String gradleIncludedConfigurationNames
+    String gradleIncludedConfigurations
 
     @ValueDescription(description="The names of the projects to exclude", group=DetectProperties.GROUP_GRADLE)
     @Value('${detect.gradle.excluded.projects}')
-    String gradleExcludedProjectNames
+    String gradleExcludedProjects
 
     @ValueDescription(description="The names of the projects to include", group=DetectProperties.GROUP_GRADLE)
     @Value('${detect.gradle.included.projects}')
-    String gradleIncludedProjectNames
+    String gradleIncludedProjects
 
     @ValueDescription(description="Set this to false if you do not want the 'blackduck' directory in your build directory to be deleted.", defaultValue="true", group=DetectProperties.GROUP_GRADLE)
     @Value('${detect.gradle.cleanup.build.blackduck.directory}')
@@ -192,19 +178,19 @@ class DetectProperties {
 
     @ValueDescription(description="Name of the Nuget Inspector", defaultValue="IntegrationNugetInspector", group=DetectProperties.GROUP_NUGET)
     @Value('${detect.nuget.inspector.name}')
-    String nugetInspectorPackageName
+    String nugetInspectorName
 
-    @ValueDescription(description="Version of the Nuget Inspector", defaultValue="2.1.1", group=DetectProperties.GROUP_NUGET)
+    @ValueDescription(description="Version of the Nuget Inspector", defaultValue="2.1.0", group=DetectProperties.GROUP_NUGET)
     @Value('${detect.nuget.inspector.version}')
-    String nugetInspectorPackageVersion
+    String nugetInspectorVersion
 
     @ValueDescription(description="The names of the projects in a solution to exclude", group=DetectProperties.GROUP_NUGET)
     @Value('${detect.nuget.excluded.modules}')
-    String nugetInspectorExcludedModules
+    String nugetExcludedModules
 
     @ValueDescription(description="If true errors will be logged and then ignored.", defaultValue="false", group=DetectProperties.GROUP_NUGET)
     @Value('${detect.nuget.ignore.failure}')
-    Boolean nugetInspectorIgnoreFailure
+    Boolean nugetIgnoreFailure
 
     @ValueDescription(description="The name of the dependency scope to include", group=DetectProperties.GROUP_MAVEN)
     @Value('${detect.maven.scope}')
@@ -228,7 +214,7 @@ class DetectProperties {
 
     @ValueDescription(description="If true will use pip3 if available on class path", defaultValue="false", group=DetectProperties.GROUP_PIP)
     @Value('${detect.pip.pip3}')
-    Boolean pipThreeOverride
+    Boolean pipPip3
 
     @ValueDescription(description="The path of the Python executable", group=DetectProperties.GROUP_PYTHON)
     @Value('${detect.python.path}')
@@ -242,25 +228,21 @@ class DetectProperties {
     @Value('${detect.npm.path}')
     String npmPath
 
-    @ValueDescription(description="Set this value to false if you would like to exclude your dev dependencies when ran", defaultValue='true', group=DetectProperties.GROUP_NPM)
-    @Value('${detect.npm.include.dev.dependencies}')
-    String npmIncludeDevDependencies
-
     @ValueDescription(description="The path of the pear executable", group=DetectProperties.GROUP_PEAR)
     @Value('${detect.pear.path}')
     String pearPath
 
-    @ValueDescription(description="Set to true if you would like to include the not required packages", defaultValue='false', group=DetectProperties.GROUP_PEAR)
+    @ValueDescription(description="Set to true if you would like to include the not required packages", defaultValue="false", group=DetectProperties.GROUP_PEAR)
     @Value('${detect.pear.not.required.dependencies}')
     Boolean pearNotRequiredDependencies
 
     @ValueDescription(description="The path to a user's virtual environment", group=DetectProperties.GROUP_PIP)
     @Value('${detect.pip.virtualEnv.path}')
-    String virtualEnvPath
+    String pipVirtualEnvPath
 
     @ValueDescription(description="The path of the requirements.txt file", group=DetectProperties.GROUP_PIP)
     @Value('${detect.pip.requirements.path}')
-    String requirementsFilePath
+    String pipRequirementsPath
 
     @ValueDescription(description="Path of the Go Dep executable", group=DetectProperties.GROUP_GO)
     @Value('${detect.go.dep.path}')
@@ -290,15 +272,15 @@ class DetectProperties {
     @Value('${detect.bash.path}')
     String bashPath
 
-    @ValueDescription(description="The logging level of Detect (ALL|TRACE|DEBUG|INFO|WARN|ERROR|FATAL|OFF)", defaultValue='INFO', group=DetectProperties.GROUP_LOGGING)
+    @ValueDescription(description="The logging level of Detect (ALL|TRACE|DEBUG|INFO|WARN|ERROR|FATAL|OFF)", defaultValue="INFO", group=DetectProperties.GROUP_LOGGING)
     @Value('${logging.level.com.blackducksoftware.integration}')
     String loggingLevel
 
-    @ValueDescription(description="Detect creates temporary files in the output directory. If set to true this will clean them up after execution", defaultValue='true', group=DetectProperties.GROUP_CLEANUP)
+    @ValueDescription(description="Detect creates temporary files in the output directory. If set to true this will clean them up after execution", defaultValue="true", group=DetectProperties.GROUP_CLEANUP)
     @Value('${detect.cleanup.bom.tool.files}')
     Boolean cleanupBomToolFiles
 
-    @ValueDescription(description="If set to true, the signature scanner results will not be uploaded to the Hub and the scanner results will be written to disk.", defaultValue='false', group=DetectProperties.GROUP_SIGNATURE_SCANNER)
+    @ValueDescription(description="If set to true, the signature scanner results will not be uploaded to the Hub and the scanner results will be written to disk.", defaultValue="false", group=DetectProperties.GROUP_SIGNATURE_SCANNER)
     @Value('${detect.hub.signature.scanner.dry.run}')
     Boolean hubSignatureScannerDryRun
 
@@ -326,7 +308,7 @@ class DetectProperties {
     @Value('${detect.hub.signature.scanner.offline.local.path}')
     String hubSignatureScannerOfflineLocalPath
 
-    @ValueDescription(description="Set this value to false if you would like to exclude your dev requires dependencies when ran", defaultValue='true', group=DetectProperties.GROUP_PACKAGIST)
+    @ValueDescription(description="Set this value to false if you would like to exclude your dev requires dependencies when ran", defaultValue="true", group=DetectProperties.GROUP_PACKAGIST)
     @Value('${detect.packagist.include.dev.dependencies}')
     Boolean packagistIncludeDevDependencies
 
@@ -344,43 +326,43 @@ class DetectProperties {
 
     @ValueDescription(description="The names of the sbt configurations to exclude", group=DetectProperties.GROUP_SBT)
     @Value('${detect.sbt.excluded.configurations}')
-    String sbtExcludedConfigurationNames
+    String sbtExcludedConfigurations
 
-    @ValueDescription( description="The names of the sbt configurations to include", group=DetectProperties.GROUP_SBT)
+    @ValueDescription(description="The names of the sbt configurations to include", group=DetectProperties.GROUP_SBT)
     @Value('${detect.sbt.included.configurations}')
-    String sbtIncludedConfigurationNames
+    String sbtIncludedConfigurations
 
-    @ValueDescription(description="The scheme to use when the package managers can not determine a version, either 'text' or 'timestamp'", defaultValue='text', group=DetectProperties.GROUP_PROJECT_INFO)
+    @ValueDescription(description="The scheme to use when the package managers can not determine a version, either 'text' or 'timestamp'", defaultValue="text", group=DetectProperties.GROUP_PROJECT_INFO)
     @Value('${detect.default.project.version.scheme}')
     String defaultProjectVersionScheme
 
-    @ValueDescription(description="The text to use as the default project version", defaultValue='Detect Unknown Version', group=DetectProperties.GROUP_PROJECT_INFO)
+    @ValueDescription(description="The text to use as the default project version", defaultValue="Detect Unknown Version", group=DetectProperties.GROUP_PROJECT_INFO)
     @Value('${detect.default.project.version.text}')
     String defaultProjectVersionText
 
-    @ValueDescription(description="The timestamp format to use as the default project version", defaultValue='yyyy-MM-dd\'T\'HH:mm:ss.SSS', group=DetectProperties.GROUP_PROJECT_INFO)
+    @ValueDescription(description="The timestamp format to use as the default project version", defaultValue="yyyy-MM-dd\'T\'HH:mm:ss.SSS", group=DetectProperties.GROUP_PROJECT_INFO)
     @Value('${detect.default.project.version.timeformat}')
     String defaultProjectVersionTimeformat
 
     @ValueDescription(description="If set, this will aggregate all the BOMs to create a single BDIO file with the name provided. For Co-Pilot use only", group=DetectProperties.GROUP_PROJECT_INFO)
     @Value('${detect.bom.aggregate.name}')
-    String aggregateBomName
+    String bomAggregateName
 
-    @ValueDescription (description="When set to true, a Black Duck risk report in PDF form will be created", defaultValue='false', group=DetectProperties.GROUP_PROJECT_INFO)
+    @ValueDescription(description="When set to true, a Black Duck risk report in PDF form will be created", defaultValue="false", group=DetectProperties.GROUP_PROJECT_INFO)
     @Value('${detect.risk.report.pdf}')
     Boolean riskReportPdf
 
-    @ValueDescription (description="The output directory for risk report in PDF. Default is the source directory", defaultValue='.', group=DetectProperties.GROUP_PROJECT_INFO)
+    @ValueDescription(description="The output directory for risk report in PDF. Default is the source directory", defaultValue=".", group=DetectProperties.GROUP_PROJECT_INFO)
     @Value('${detect.risk.report.pdf.path}')
-    String riskReportPdfOutputDirectory
+    String riskReportPdfPath
 
-    @ValueDescription (description="When set to true, a Black Duck notices report in text form will be created in your source directory", defaultValue='false', group=DetectProperties.GROUP_PROJECT_INFO)
+    @ValueDescription(description="When set to true, a Black Duck notices report in text form will be created in your source directory", defaultValue="false", group=DetectProperties.GROUP_PROJECT_INFO)
     @Value('${detect.notices.report}')
     Boolean noticesReport
 
-    @ValueDescription (description="The output directory for notices report. Default is the source directory", defaultValue='.', group=DetectProperties.GROUP_PROJECT_INFO)
+    @ValueDescription(description="The output directory for notices report. Default is the source directory", defaultValue=".", group=DetectProperties.GROUP_PROJECT_INFO)
     @Value('${detect.notices.report.path}')
-    String noticesReportOutputDirectory
+    String noticesReportPath
 
     @ValueDescription(description="The path of the conda executable", group=DetectProperties.GROUP_CONDA)
     @Value('${detect.conda.path}')
@@ -394,16 +376,23 @@ class DetectProperties {
     @Value('${detect.gradle.inspector.air.gap.path}')
     String gradleInspectorAirGapPath
 
+    @ValueDescription(description="The url to the repository to look for the gradle inspector", group=DetectProperties.GROUP_GRADLE)
+    @Value('${detect.gradle.inspector.repository.url}')
+    String gradleInspectorRepositoryUrl
+
     @ValueDescription(description="The path to the nuget inspector nupkg", group=DetectProperties.GROUP_NUGET)
     @Value('${detect.nuget.inspector.air.gap.path}')
     String nugetInspectorAirGapPath
 
-    @ValueDescription(description="The source for nuget packages", defaultValue='https://www.nuget.org/api/v2/', group=DetectProperties.GROUP_NUGET)
+    @ValueDescription(description="The url to the repository from which Nuget should resolve dependencies from", defaultValue="https://www.nuget.org/api/v2/", group=DetectProperties.GROUP_NUGET)
     @Value('${detect.nuget.packages.repo.url}')
     String nugetPackagesRepoUrl
 
-    @ValueDescription(description="The respository gradle should use to look for the gradle inspector", group=DetectProperties.GROUP_GRADLE)
-    @Value('${detect.gradle.inspector.repository.url}')
-    String gradleInspectorRepositoryUrl
-}
+    @ValueDescription(description="Set this value to false if you would like to exclude your dev dependencies when ran", defaultValue="true", group=DetectProperties.GROUP_NPM)
+    @Value('${detect.npm.include.dev.dependencies}')
+    Boolean npmIncludeDevDependencies
 
+    @ValueDescription(description="If true, the default behavior of printing the Detect Results will be suppressed", defaultValue="false", group=DetectProperties.GROUP_LOGGING)
+    @Value('${detect.suppress.results.output}')
+    Boolean suppressResultsOutput
+}
