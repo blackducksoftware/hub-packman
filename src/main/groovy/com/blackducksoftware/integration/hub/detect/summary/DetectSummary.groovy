@@ -36,22 +36,26 @@ import groovy.transform.TypeChecked
 class DetectSummary {
     private Map<BomToolType, Result> bomToolResults = new HashMap<>()
     private Map<File, Result> scanResults = new HashMap<>()
-    Result overallResult = null;
+    Result overallResult = null
 
     public void addApplicableBomToolType(BomToolType bomToolType) {
-        bomToolResults.put(bomToolType, Result.FAILURE)
+        bomToolResults.put(bomToolType, null)
     }
 
     public void setBomToolResult(BomToolType bomToolType, Result result) {
-        bomToolResults.put(bomToolType, result)
+        if (result != null && Result.FAILURE != bomToolResults.get(bomToolType) ) {
+            bomToolResults.put(bomToolType, result)
+        }
     }
 
     public void addPathToBeScanned(File scanPath) {
-        scanResults.put(scanPath, Result.FAILURE)
+        scanResults.put(scanPath, null)
     }
 
     public void setPathScanResult(File scanPath, Result result) {
-        scanResults.put(scanPath, result)
+        if (result != null && Result.FAILURE != scanResults.get(scanPath) ) {
+            scanResults.put(scanPath, result)
+        }
     }
 
     public void setOverallFailure() {
@@ -60,7 +64,7 @@ class DetectSummary {
 
     public void logResults(IntLogger logger) {
         if (overallResult == null) {
-            if (bomToolResults.containsValue(Result.FAILURE) || scanResults.containsValue(Result.FAILURE)) {
+            if (bomToolResults.containsValue(Result.FAILURE) || bomToolResults.containsValue(null) || scanResults.containsValue(Result.FAILURE) || scanResults.containsValue(null)) {
                 overallResult = Result.FAILURE
             } else {
                 overallResult = Result.SUCCESS

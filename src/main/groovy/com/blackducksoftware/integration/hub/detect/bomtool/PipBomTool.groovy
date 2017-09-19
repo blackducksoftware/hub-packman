@@ -35,6 +35,8 @@ import com.blackducksoftware.integration.hub.detect.bomtool.pip.PythonEnvironmen
 import com.blackducksoftware.integration.hub.detect.bomtool.pip.PythonEnvironmentHandler
 import com.blackducksoftware.integration.hub.detect.model.BomToolType
 import com.blackducksoftware.integration.hub.detect.model.DetectCodeLocation
+import com.blackducksoftware.integration.hub.detect.summary.DetectSummary
+import com.blackducksoftware.integration.hub.detect.summary.Result
 import com.blackducksoftware.integration.hub.detect.util.executable.Executable
 
 import groovy.transform.TypeChecked
@@ -52,6 +54,9 @@ class PipBomTool extends BomTool {
 
     @Autowired
     PythonEnvironmentHandler virtualEnvironmentHandler
+
+    @Autowired
+    DetectSummary detectSummary
 
     BomToolType getBomToolType() {
         BomToolType.PIP
@@ -84,6 +89,9 @@ class PipBomTool extends BomTool {
         PythonEnvironment pythonEnvironment = virtualEnvironmentHandler.getEnvironment(detectConfiguration.virtualEnvPath)
         DependencyNode projectNode = makeDependencyNode(pythonEnvironment)
         def codeLocation = new DetectCodeLocation(BomToolType.PIP, sourcePath, projectNode)
+        if (!projectNode || (projectNode.name.equals('') && projectNode.version.equals('') && projectNode.children.empty)) {
+            detectSummary.setBomToolResult(BomToolType.PIP, Result.FAILURE)
+        }
 
         [codeLocation]
     }
