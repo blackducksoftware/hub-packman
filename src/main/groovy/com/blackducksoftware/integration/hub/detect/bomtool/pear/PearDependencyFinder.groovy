@@ -32,90 +32,118 @@ import com.blackducksoftware.integration.hub.bdio.simple.model.DependencyNode
 import com.blackducksoftware.integration.hub.bdio.simple.model.Forge
 import com.blackducksoftware.integration.hub.bdio.simple.model.externalid.NameVersionExternalId
 import com.blackducksoftware.integration.hub.detect.DetectConfiguration
-import com.blackducksoftware.integration.hub.detect.util.DetectFileManager
+import com.blackducksoftware.integration.hub.detect.nameversion.NameVersionNodeImpl
 import com.blackducksoftware.integration.hub.detect.util.executable.ExecutableOutput
-import com.blackducksoftware.integration.hub.detect.util.executable.ExecutableRunner
 
 import groovy.transform.TypeChecked
 
 @Component
 @TypeChecked
+//TODO Separate the different parsing into multiple files.
 class PearDependencyFinder {
+    private static final String EQUALS_LINE = '==='
+    private static final String DEPENDENCY_TYPE_PACKAGE = 'package'
+
     private final Logger logger = LoggerFactory.getLogger(PearDependencyFinder.class)
-
-    @Autowired
-    DetectFileManager detectFileManager
-
-    @Autowired
-    ExecutableRunner executableRunner
 
     @Autowired
     DetectConfiguration detectConfiguration
 
-    public Set<DependencyNode> parsePearDependencyList(ExecutableOutput pearListing, ExecutableOutput pearDependencies) {
-        Set<DependencyNode> childNodes = []
-
-        if (pearDependencies.errorOutput || pearListing.errorOutput) {
-            logger.error("There was an error during execution.")
-        } else if (!pearDependencies.standardOutput || !pearListing.standardOutput) {
-            logger.error("No information retrieved from running pear commands")
-        } else {
-            def nameList = findDependencyNames(pearDependencies.standardOutput)
-            childNodes = createPearDependencyNodeFromList(pearListing.standardOutput, nameList)
+    public Set<DependencyNode> parsePearDependencyList(ExecutableOutput pearInstalledDependencies, ExecutableOutput pearPackageXmlDependencies) {
+        if (pearPackageXmlDependencies.errorOutput || pearInstalledDependencies.errorOutput) {
+            logger.error("There was an error during execution.${pearInstalledDependencies.errorOutput}${pearPackageXmlDependencies.errorOutput}")
+            if (!pearPackageXmlDependencies.standardOutput && !pearInstalledDependencies.standardOutput) {
+                return (Set<DependencyNode>) []
+            }
+        } else if (!pearPackageXmlDependencies.standardOutput || !pearInstalledDependencies.standardOutput) {
+            logger.error("Not enough information retrieved from running pear commands")
+            return (Set<DependencyNode>) []
         }
+
+        Set<String> dependenciesFromPackageXml = findDependencyNames(pearPackageXmlDependencies.standardOutput)
+        Set<DependencyNode> childNodes = createPearDependencyNodeFromList(pearInstalledDependencies.standardOutput, dependenciesFromPackageXml)
 
         childNodes
     }
 
-    private List<String> findDependencyNames(String list) {
-        def nameList = []
-        String[] content = list.split(System.lineSeparator())
+    private Set<String> findDependencyNames(String packageXmlDependencies) {
+        Set<String> dependenciesList = []
+        List<String> cleanedDependenciesList = cleanExecutableOutput(packageXmlDependencies)
 
-        if (content.size() > 5) {
-            def listing = content[5..-1]
-            listing.each { line ->
-                String[] dependencyInfo = line.trim().split(' ')
-                dependencyInfo -= ''
-
-                String dependencyName = dependencyInfo[2].trim()
-                String dependencyRequired = dependencyInfo[0].trim()
-
-                if (dependencyName) {
-                    if (detectConfiguration.getPearNotRequiredDependencies()) {
-                        nameList.add(dependencyName.split('/')[-1])
-                    } else {
-                        if (BooleanUtils.toBoolean(dependencyRequired)) {
-                            nameList.add(dependencyName.split('/')[-1])
-                        }
+        cleanedDependenciesList.each {
+            PackageXmlDependency packageDependency= createDependencyFromPackageXml(it)
+            //TODO swap the comparison
+            if (packageDependency.type?.equalsIgnoreCase(DEPENDENCY_TYPE_PACKAGE)) {
+                if (detectConfiguration.pearNotRequiredDependencies) {
+                    dependenciesList.add(packageDependency.name)
+                } else {
+                    if (packageDependency.required) {
+                        dependenciesList.add(packageDependency.name)
                     }
                 }
             }
         }
 
-        nameList
+        dependenciesList
     }
 
-    private Set<DependencyNode> createPearDependencyNodeFromList(String list, List<String> dependencyNames) {
-        Set<DependencyNode> childrenNodes = []
-        String[] dependencyList = list.split(System.lineSeparator())
+    //TODO change list name to something
+    private Set<DependencyNode> createPearDependencyNodeFromList(String list, Set<String> packageXmlDependencyNames) {
+        Set<DependencyNode> dependencyNodes = []
+        List<String> installedDependencies = cleanExecutableOutput(list)
 
-        if (dependencyList.size() > 3) {
-            def listing = dependencyList[3..-1]
-            listing.each { line ->
-                String[] dependencyInfo = line.trim().split(' ')
-                dependencyInfo -= ''
-
-                String packageName = dependencyInfo[0].trim()
-                String packageVersion = dependencyInfo[1].trim()
-
-                if (dependencyInfo && dependencyNames.contains(packageName)) {
-                    def newNode = new DependencyNode(packageName, packageVersion, new NameVersionExternalId(Forge.PEAR, packageName, packageVersion))
-
-                    childrenNodes.add(newNode)
-                }
+        installedDependencies.each {
+            NameVersionNodeImpl dependencyItem = createDependencyNameVersion(it)
+            if (packageXmlDependencyNames.contains(dependencyItem.name)) {
+                dependencyNodes.add(new DependencyNode(dependencyItem.name, dependencyItem.version, new NameVersionExternalId(Forge.PEAR, dependencyItem.name, dependencyItem.version)))
             }
         }
 
-        childrenNodes
+        dependencyNodes
+    }
+
+    //TODO Create second list by adding the items I need
+    private List<String> cleanExecutableOutput(String executableOutput) {
+        def lines = executableOutput.split(System.lineSeparator()).toList()
+        lines.removeAll('')
+        def headerText = []
+
+        lines.eachWithIndex { line, index ->
+            if (line.contains(EQUALS_LINE)) {
+                headerText.add(lines.get(index - 1))
+                headerText.add(lines.get(index))
+                //TODO check array size
+                headerText.add(lines.get(index + 1))
+            }
+        }
+
+        lines.removeAll(headerText)
+        lines
+    }
+
+    private NameVersionNodeImpl createDependencyNameVersion(String installedDependency) {
+        def dependencyNameVersion = new NameVersionNodeImpl()
+
+        //TODO lookup whitespace regex
+        def dependencyNameVersionParts = installedDependency.split('\\W+').toList()
+        dependencyNameVersionParts.removeAll('')
+        dependencyNameVersion.name = dependencyNameVersionParts[0]
+        dependencyNameVersion.version = dependencyNameVersionParts[1]
+
+        dependencyNameVersion
+    }
+
+    private PackageXmlDependency createDependencyFromPackageXml(String packageXmlDependencies) {
+        def packageDependency = new PackageXmlDependency()
+
+        def packageDependencyParts = packageXmlDependencies.split(' ').toList()
+        packageDependencyParts.removeAll('')
+        packageDependency.required = BooleanUtils.toBoolean(packageDependencyParts.get(0))
+        packageDependency.setType(packageDependencyParts.get(1))
+        String messyName = packageDependencyParts.get(2)
+        int slashIndex = messyName.indexOf('/') + 1
+        packageDependency.name = messyName.substring(slashIndex)
+
+        packageDependency
     }
 }

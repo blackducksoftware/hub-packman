@@ -72,7 +72,7 @@ class PearBomTool extends BomTool {
 
     @Override
     public List<DetectCodeLocation> extractDetectCodeLocations() {
-        ExecutableOutput pearListing = executableRunner.runExe(pearExePath, 'list')
+        ExecutableOutput pearListing = executableRunner.runExe(pearExePath, 'list', '-a')
         ExecutableOutput pearDependencies = executableRunner.runExe(pearExePath, 'package-dependencies', PACKAGE_XML_FILENAME)
 
         File packageFile = detectFileManager.findFile(sourcePath, PACKAGE_XML_FILENAME)
