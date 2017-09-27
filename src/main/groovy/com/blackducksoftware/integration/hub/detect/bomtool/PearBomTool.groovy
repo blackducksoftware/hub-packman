@@ -63,7 +63,7 @@ class PearBomTool extends BomTool {
         if (containsPackageXml) {
             pearExePath = findExecutablePath(ExecutableType.PEAR, true, detectConfiguration.getPearPath())
             if (!pearExePath) {
-                logger.warn("Could not find a ${executableManager.getExecutableName(ExecutableType.PEAR)} executable")
+                logger.warn("Could not find a ${executableManager.getExecutableNames(ExecutableType.PEAR).join(' or ')} executable")
             }
         }
 

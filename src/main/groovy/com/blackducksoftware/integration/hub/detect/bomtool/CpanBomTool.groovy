@@ -64,10 +64,10 @@ class CpanBomTool extends BomTool {
             cpanExecutablePath = findExecutablePath(ExecutableType.CPAN, true, detectConfiguration.getCpanPath())
             cpanmExecutablePath = findExecutablePath(ExecutableType.CPANM, true, detectConfiguration.getCpanmPath())
             if (!cpanExecutablePath) {
-                logger.warn("Could not find the ${executableManager.getExecutableName(ExecutableType.CPAN)} executable")
+                logger.warn("Could not find the ${executableManager.getExecutableNames(ExecutableType.CPAN).join(' or ')} executable")
             }
             if (!cpanmExecutablePath) {
-                logger.warn("Could not find the ${executableManager.getExecutableName(ExecutableType.CPANM)} executable")
+                logger.warn("Could not find the ${executableManager.getExecutableNames(ExecutableType.CPANM).join(' or ')} executable")
             }
         }
 

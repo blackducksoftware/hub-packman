@@ -86,7 +86,7 @@ class GoDepBomTool extends BomTool {
             goExecutablePath = executableManager.getExecutablePath(ExecutableType.GO, true, sourcePath)
         }
         if (isTheBestGoBomTool && !goExecutablePath) {
-            logger.warn("Could not find the ${executableManager.getExecutableName(ExecutableType.GO)} executable")
+            logger.warn("Could not find the ${executableManager.getExecutableNames(ExecutableType.GO).join(' or ')} executable")
         }
 
         goExecutablePath && isTheBestGoBomTool
@@ -144,6 +144,6 @@ class GoDepBomTool extends BomTool {
 
     private File getBuiltGoDep() {
         def goOutputDirectory = new File(detectConfiguration.outputDirectory, 'Go')
-        new File(goOutputDirectory, executableManager.getExecutableName(ExecutableType.GO_DEP))
+        new File(goOutputDirectory, executableManager.getDefaultExecutableName(ExecutableType.GO_DEP))
     }
 }

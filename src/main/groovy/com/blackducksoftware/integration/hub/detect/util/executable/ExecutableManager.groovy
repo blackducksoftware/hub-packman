@@ -61,8 +61,13 @@ class ExecutableManager {
         }
     }
 
-    String getExecutableName(ExecutableType executableType) {
-        executableType.getExecutable(currentOs)
+    String getDefaultExecutableName(ExecutableType executableType) {
+        executableType.getExecutables(currentOs)[0]
+    }
+
+
+    List<String> getExecutableNames(ExecutableType executableType) {
+        executableType.getExecutables(currentOs)
     }
 
     String getExecutablePath(ExecutableType executableType, boolean searchSystemPath, String path) {
@@ -70,26 +75,28 @@ class ExecutableManager {
     }
 
     File getExecutable(ExecutableType executableType, boolean searchSystemPath, String path) {
-        String executable = getExecutableName(executableType)
+        List<String> executables = getExecutableNames(executableType)
         String searchPath = path.trim()
-        File executableFile = findExecutableFileFromPath(searchPath, executable)
+        File executableFile = findExecutableFileFromPath(searchPath, executables)
         if (searchSystemPath && !executableFile) {
-            executableFile = findExecutableFileFromSystemPath(executable)
+            executableFile = findExecutableFileFromSystemPath(executables)
         }
 
         executableFile
     }
 
-    private File findExecutableFileFromSystemPath(final String executable) {
+    private File findExecutableFileFromSystemPath(final List<String> executables) {
         String systemPath = System.getenv("PATH")
-        return findExecutableFileFromPath(systemPath, executable)
+        return findExecutableFileFromPath(systemPath, executables)
     }
 
-    private File findExecutableFileFromPath(final String path, String executable) {
+    private File findExecutableFileFromPath(final String path, List<String> executables) {
         for (String pathPiece : path.split(File.pathSeparator)) {
-            File foundFile = detectFileManager.findFile(pathPiece, executable)
-            if (foundFile && foundFile.canExecute()) {
-                return foundFile
+            for(String executable : executables) {
+                File foundFile = detectFileManager.findFile(pathPiece, executable)
+                if (foundFile && foundFile.canExecute()) {
+                    return foundFile
+                }
             }
         }
         null
