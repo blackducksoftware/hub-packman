@@ -144,6 +144,6 @@ class GoDepBomTool extends BomTool {
 
     private File getBuiltGoDep() {
         def goOutputDirectory = new File(detectConfiguration.outputDirectory, 'Go')
-        new File(goOutputDirectory, executableManager.getDefaultExecutableName(ExecutableType.GO_DEP))
+        new File(goOutputDirectory, executableManager.getExecutableNames(ExecutableType.GO_DEP)[0])
     }
 }

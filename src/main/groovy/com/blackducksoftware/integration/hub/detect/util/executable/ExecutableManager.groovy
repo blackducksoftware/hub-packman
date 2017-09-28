@@ -61,11 +61,6 @@ class ExecutableManager {
         }
     }
 
-    String getDefaultExecutableName(ExecutableType executableType) {
-        executableType.getExecutables(currentOs)[0]
-    }
-
-
     List<String> getExecutableNames(ExecutableType executableType) {
         executableType.getExecutables(currentOs)
     }
