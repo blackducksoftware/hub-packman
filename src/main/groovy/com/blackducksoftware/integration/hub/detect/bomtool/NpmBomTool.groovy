@@ -97,7 +97,7 @@ class NpmBomTool extends BomTool {
         } else if (containsPackageJson && containsNodeModules) {
             npmExePath = findExecutablePath(ExecutableType.NPM, true, detectConfiguration.getNpmPath())
             if (!npmExePath) {
-                logger.warn("Could not find an ${executableManager.getExecutableName(ExecutableType.NPM)} executable")
+                logger.warn("Could not find an ${executableManager.getExecutableNames(ExecutableType.NPM).join(' or ')} executable")
             } else {
                 npmLsExe = new Executable(new File(sourcePath), npmExePath, ['-version'])
                 String npmNodePath = detectConfiguration.getNpmNodePath()

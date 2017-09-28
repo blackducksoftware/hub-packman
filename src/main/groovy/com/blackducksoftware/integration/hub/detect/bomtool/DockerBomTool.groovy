@@ -76,10 +76,10 @@ class DockerBomTool extends BomTool {
             dockerExecutablePath = findExecutablePath(ExecutableType.DOCKER, true, detectConfiguration.dockerPath)
             bashExecutablePath = findExecutablePath(ExecutableType.BASH, true, detectConfiguration.bashPath)
             if (!dockerExecutablePath) {
-                logger.warn("Could not find a ${executableManager.getExecutableName(ExecutableType.DOCKER)} executable")
+                logger.warn("Could not find the ${executableManager.getExecutableNames(ExecutableType.DOCKER).join(' or ')} executable")
             }
             if (!bashExecutablePath) {
-                logger.warn("Could not find a ${executableManager.getExecutableName(ExecutableType.BASH)} executable")
+                logger.warn("Could not find the ${executableManager.getExecutableNames(ExecutableType.BASH).join(' or ')} executable")
             }
         }
 

@@ -61,7 +61,7 @@ class CondaBomTool extends BomTool {
         if (containsFiles) {
             condaExecutablePath = findExecutablePath(ExecutableType.CONDA, true, detectConfiguration.getCondaPath())
             if (!condaExecutablePath) {
-                logger.warn("Could not find the ${executableManager.getExecutableName(ExecutableType.CONDA)} executable")
+                logger.warn("Could not find the ${executableManager.getExecutableNames(ExecutableType.CONDA).join(' or ')} executable")
             }
         }
 
