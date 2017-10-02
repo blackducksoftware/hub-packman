@@ -47,7 +47,7 @@ class PipInspectorTreeParser {
     public static final String INDENTATION = ' '.multiply(4)
 
     DependencyNode parse(String treeText) {
-        def lines = treeText.trim().split("\\r?\\n").toList()
+        def lines = treeText.trim().split("\\u000D\\u000A|[\\u000A\\u000B\\u000C\\u000D\\u0085\\u2028\\u2029]").toList()
 
         DependencyNodeBuilder dependencyNodeBuilder = null
         Stack<DependencyNode> tree = new Stack<>()

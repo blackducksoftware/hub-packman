@@ -66,7 +66,7 @@ class CpanPackager {
 
     private List<String> getDirectModuleNames(String directDependenciesText) {
         List<String> modules = []
-        for (String line : directDependenciesText.split("\\r?\\n")) {
+        for (String line : directDependenciesText.split("\\u000D\\u000A|[\\u000A\\u000B\\u000C\\u000D\\u0085\\u2028\\u2029]")) {
             if (!line?.trim()) {
                 continue
             }

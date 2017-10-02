@@ -58,7 +58,7 @@ class MavenCodeLocationPackager {
         dependencyParentStack = new Stack<>()
         parsingProjectSection = false
         level = 0
-        for (String line : mavenOutputText.split("\\r?\\n")) {
+        for (String line : mavenOutputText.split("\\u000D\\u000A|[\\u000A\\u000B\\u000C\\u000D\\u0085\\u2028\\u2029]")) {
             if (!(line ==~ /\[.*INFO.*\].*/) || line ==~ /\[.*INFO.*\].*Downloaded:.*/ || line ==~ /\[.*INFO.*\].*Downloading:.*/) {
                 // If the line does not start with [INFO] and have content, we will ignore it
                 // We also ignore lines for downloads
