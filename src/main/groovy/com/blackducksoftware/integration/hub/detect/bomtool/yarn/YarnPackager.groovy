@@ -49,7 +49,7 @@ class YarnPackager {
 
         NameVersionNode currentNode = null
         boolean dependenciesStarted = false
-        for (String line : yarnLockText.split(System.lineSeparator())) {
+        for (String line : yarnLockText.split("\\r?\\n")) {
             if (!line.trim()) {
                 continue
             }
