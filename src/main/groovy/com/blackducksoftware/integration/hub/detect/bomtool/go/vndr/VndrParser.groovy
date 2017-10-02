@@ -34,7 +34,7 @@ class VndrParser {
     public List<DependencyNode> parseVendorConf(String vendorConfContents) {
         List<DependencyNode> nodes = new ArrayList<>()
         String contents = vendorConfContents.trim()
-        def lines = contents.split("\\r?\\n")
+        def lines = contents.split("\\u000D\\u000A|[\\u000A\\u000B\\u000C\\u000D\\u0085\\u2028\\u2029]")
         //TODO test against moby
         lines.each { String line ->
             if (line?.trim() && !line.startsWith('#')) {

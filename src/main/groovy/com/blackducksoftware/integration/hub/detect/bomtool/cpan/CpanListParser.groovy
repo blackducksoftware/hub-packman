@@ -39,7 +39,7 @@ class CpanListParser {
     public Map<String, NameVersionNode> parse(String listText) {
         Map<String, NameVersionNode> moduleMap = [:]
 
-        for (String line: listText.split("\\r?\\n")) {
+        for (String line: listText.split("\\u000D\\u000A|[\\u000A\\u000B\\u000C\\u000D\\u0085\\u2028\\u2029]")) {
             if (!line.trim()) {
                 continue
             }

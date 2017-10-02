@@ -118,7 +118,7 @@ class PipBomTool extends BomTool {
                     setupFile.absolutePath,
                     '--name'
                 ])
-                String[] output = executableRunner.execute(findProjectNameExecutable).standardOutput.split("\\r?\\n")
+                String[] output = executableRunner.execute(findProjectNameExecutable).standardOutput.split("\\u000D\\u000A|[\\u000A\\u000B\\u000C\\u000D\\u0085\\u2028\\u2029]")
                 projectName = output[output.length - 1].replace('_', '-').trim()
             }
         }
