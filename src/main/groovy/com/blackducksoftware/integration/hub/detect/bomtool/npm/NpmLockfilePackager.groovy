@@ -25,17 +25,14 @@ package com.blackducksoftware.integration.hub.detect.bomtool.npm
 import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.stereotype.Component
 
-import com.blackducksoftware.integration.hub.bdio.graph.DependencyGraph
+import com.blackducksoftware.integration.hub.bdio.graph.MutableMapDependencyGraph
 import com.blackducksoftware.integration.hub.bdio.model.Forge
+import com.blackducksoftware.integration.hub.bdio.model.dependency.Dependency
 import com.blackducksoftware.integration.hub.bdio.model.externalid.ExternalId
 import com.blackducksoftware.integration.hub.bdio.model.externalid.ExternalIdFactory
+import com.blackducksoftware.integration.hub.detect.bomtool.npm.model.NpmPackage
 import com.blackducksoftware.integration.hub.detect.model.BomToolType
 import com.blackducksoftware.integration.hub.detect.model.DetectCodeLocation
-import com.blackducksoftware.integration.hub.detect.nameversion.NameVersionNode
-import com.blackducksoftware.integration.hub.detect.nameversion.NameVersionNodeImpl
-import com.blackducksoftware.integration.hub.detect.nameversion.NameVersionNodeTransformer
-import com.blackducksoftware.integration.hub.detect.nameversion.builder.LinkedNameVersionNodeBuilder
-import com.blackducksoftware.integration.hub.detect.nameversion.builder.NameVersionNodeBuilder
 import com.google.gson.Gson
 
 import groovy.transform.TypeChecked
@@ -43,33 +40,38 @@ import groovy.transform.TypeChecked
 @Component
 @TypeChecked
 class NpmLockfilePackager {
-    @Autowired
-    Gson gson
 
     @Autowired
-    NameVersionNodeTransformer nameVersionNodeTransformer
+    Gson gson
 
     @Autowired
     ExternalIdFactory externalIdFactory
 
     public DetectCodeLocation parse(String sourcePath, String lockFileText) {
-        NpmProject npmProject = gson.fromJson(lockFileText, NpmProject.class)
+        NpmPackage npmProject = gson.fromJson(lockFileText, NpmPackage.class)
+        MutableMapDependencyGraph graph = new MutableMapDependencyGraph()
 
-        NameVersionNode root = new NameVersionNodeImpl([name: npmProject.name, version: npmProject.version])
-        NameVersionNodeBuilder builder = new LinkedNameVersionNodeBuilder(root)
+        Dependency root = generateDependency(npmProject.name, npmProject.version)
 
         npmProject.dependencies.each { name, npmDependency ->
-            NameVersionNode dependency = new NameVersionNodeImpl([name: name, version: npmDependency.version])
-            builder.addChildNodeToParent(dependency, root)
+            if (name != null && npmDependency.version != null) {
+                Dependency projectDependency = generateDependency(name, npmDependency.version)
+                graph.addChildToRoot(projectDependency)
 
-            npmDependency.requires?.each { childName, childVersion ->
-                NameVersionNode child = new NameVersionNodeImpl([name: childName, version: childVersion])
-                builder.addChildNodeToParent(child, dependency)
+                npmDependency.requires?.each { childName, childVersion ->
+                    Dependency child = generateDependency(childName, childVersion)
+                    graph.addChildWithParent(child, projectDependency)
+                }
             }
         }
 
         ExternalId projectId = externalIdFactory.createNameVersionExternalId(Forge.NPM, npmProject.name, npmProject.version)
-        DependencyGraph graph = nameVersionNodeTransformer.createDependencyGraph(Forge.NPM, builder.build(), false)
         DetectCodeLocation codeLocation = new DetectCodeLocation(BomToolType.NPM, sourcePath, npmProject.name, npmProject.version, projectId, graph);
+    }
+
+    private Dependency generateDependency(String name, String version) {
+        final ExternalId externalId = externalIdFactory.createNameVersionExternalId(Forge.NPM, name, version);
+        final Dependency dependency = new Dependency(name, version, externalId);
+        return dependency;
     }
 }

@@ -329,12 +329,14 @@ class DetectConfiguration {
     public String getNugetPath() {
         return detectProperties.nugetPath
     }
+    @Deprecated
     public String getNpmPath() {
         return detectProperties.npmPath
     }
     public boolean getNpmIncludeDevDependencies() {
         return BooleanUtils.toBoolean(detectProperties.npmIncludeDevDependencies)
     }
+    @Deprecated
     public String getNpmNodePath() {
         return detectProperties.npmNodePath
     }
