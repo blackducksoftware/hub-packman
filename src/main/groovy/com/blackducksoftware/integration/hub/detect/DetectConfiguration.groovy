@@ -248,6 +248,11 @@ class DetectConfiguration {
         return longObj == null ? 0L : longObj.longValue()
     }
 
+    public List<String> getHubSignatureScannerPathsToExclude() {
+        return excludedScanPaths
+    }
+
+    //AUTO-GENERATE PROPERTIES START MARKER
     public boolean getCleanupBdioFiles() {
         return BooleanUtils.toBoolean(detectProperties.cleanupBdioFiles)
     }
@@ -455,9 +460,6 @@ class DetectConfiguration {
     public String[] getHubSignatureScannerExclusionPatterns() {
         return detectProperties.hubSignatureScannerExclusionPatterns
     }
-    public List<String> getHubSignatureScannerPathsToExclude() {
-        return excludedScanPaths
-    }
     public String getHubSignatureScannerOfflineLocalPath() {
         return detectProperties.hubSignatureScannerOfflineLocalPath
     }
@@ -471,7 +473,7 @@ class DetectConfiguration {
         return convertInt(detectProperties.hubSignatureScannerMemory)
     }
     public boolean getHubSignatureScannerDisabled() {
-        BooleanUtils.toBoolean(detectProperties.getHubSignatureScannerDisabled())
+        return BooleanUtils.toBoolean(detectProperties.hubSignatureScannerDisabled)
     }
     public String getPerlPath() {
         return detectProperties.perlPath?.trim()
@@ -533,4 +535,6 @@ class DetectConfiguration {
     public String getGradleInspectorRepositoryUrl() {
         return detectProperties.gradleInspectorRepositoryUrl?.trim()
     }
+    //AUTO-GENERATE PROPERTIES END MARKER
+
 }

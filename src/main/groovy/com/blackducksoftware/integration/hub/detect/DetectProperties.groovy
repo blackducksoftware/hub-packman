@@ -142,15 +142,15 @@ class DetectProperties {
     @Value('${detect.project.version.name}')
     String projectVersionName
 
-    @ValueDescription(description = "A prefix to the name of the codelocations created by Detect. Useful for running against the same projects on multiple machines.", defaultValue='', group=DetectProperties.GROUP_PROJECT_INFO)
+    @ValueDescription(description = "A prefix to the name of the codelocations created by Detect. Useful for running against the same projects on multiple machines.", defaultValue="", group=DetectProperties.GROUP_PROJECT_INFO)
     @Value('${detect.project.codelocation.prefix}')
     String projectCodeLocationPrefix
 
-    @ValueDescription(description = "A suffix to the name of the codelocations created by Detect.", defaultValue='', group=DetectProperties.GROUP_PROJECT_INFO)
+    @ValueDescription(description = "A suffix to the name of the codelocations created by Detect.", defaultValue="", group=DetectProperties.GROUP_PROJECT_INFO)
     @Value('${detect.project.codelocation.suffix}')
     String projectCodeLocationSuffix
 
-    @ValueDescription(description = "If set to true, when an old code location format is found in the Hub, instead of logging a warning, the code location will be deleted. USE WITH CAUTION - THIS CAN DELETE CODE LOCATIONS IN THE HUB.", defaultValue='false', group=DetectProperties.GROUP_PROJECT_INFO)
+    @ValueDescription(description = "If set to true, when an old code location format is found in the Hub, instead of logging a warning, the code location will be deleted. USE WITH CAUTION - THIS CAN DELETE CODE LOCATIONS IN THE HUB.", defaultValue="false", group=DetectProperties.GROUP_PROJECT_INFO)
     @Value('${detect.project.codelocation.delete.old.names}')
     Boolean projectCodeLocationDeleteOldNames
 
@@ -258,7 +258,7 @@ class DetectProperties {
     @Value('${detect.npm.path}')
     String npmPath
 
-    @ValueDescription(description="Set this value to false if you would like to exclude your dev dependencies when ran", defaultValue='true', group=DetectProperties.GROUP_NPM)
+    @ValueDescription(description="Set this value to false if you would like to exclude your dev dependencies when ran", defaultValue="true", group=DetectProperties.GROUP_NPM)
     @Value('${detect.npm.include.dev.dependencies}')
     String npmIncludeDevDependencies
 
@@ -270,7 +270,7 @@ class DetectProperties {
     @Value('${detect.pear.path}')
     String pearPath
 
-    @ValueDescription(description="Set to true if you would like to include only required packages", defaultValue='false', group=DetectProperties.GROUP_PEAR)
+    @ValueDescription(description="Set to true if you would like to include only required packages", defaultValue="false", group=DetectProperties.GROUP_PEAR)
     @Value('${detect.pear.only.required.deps}')
     Boolean pearOnlyRequiredDependencies
 
@@ -282,7 +282,7 @@ class DetectProperties {
     @Value('${detect.go.dep.path}')
     String goDepPath
 
-    @ValueDescription(description="If set to true, we will attempt to run 'init' and 'ensure' which can modify your development environment.", defaultValue='false', group=DetectProperties.GROUP_GO)
+    @ValueDescription(description="If set to true, we will attempt to run 'init' and 'ensure' which can modify your development environment.", defaultValue="false", group=DetectProperties.GROUP_GO)
     @Value('${detect.go.run.dep.init}')
     Boolean goRunDepInit
 
@@ -310,15 +310,15 @@ class DetectProperties {
     @Value('${detect.bash.path}')
     String bashPath
 
-    @ValueDescription(description="The logging level of Detect (ALL|TRACE|DEBUG|INFO|WARN|ERROR|FATAL|OFF)", defaultValue='INFO', group=DetectProperties.GROUP_LOGGING)
+    @ValueDescription(description="The logging level of Detect (ALL|TRACE|DEBUG|INFO|WARN|ERROR|FATAL|OFF)", defaultValue="INFO", group=DetectProperties.GROUP_LOGGING)
     @Value('${logging.level.com.blackducksoftware.integration}')
     String loggingLevel
 
-    @ValueDescription(description="Detect creates temporary files in the output directory. If set to true this will clean them up after execution", defaultValue='true', group=DetectProperties.GROUP_CLEANUP)
+    @ValueDescription(description="Detect creates temporary files in the output directory. If set to true this will clean them up after execution", defaultValue="true", group=DetectProperties.GROUP_CLEANUP)
     @Value('${detect.cleanup.bom.tool.files}')
     Boolean cleanupBomToolFiles
 
-    @ValueDescription(description="If set to true, the signature scanner results will not be uploaded to the Hub and the scanner results will be written to disk.", defaultValue='false', group=DetectProperties.GROUP_SIGNATURE_SCANNER)
+    @ValueDescription(description="If set to true, the signature scanner results will not be uploaded to the Hub and the scanner results will be written to disk.", defaultValue="false", group=DetectProperties.GROUP_SIGNATURE_SCANNER)
     @Value('${detect.hub.signature.scanner.dry.run}')
     Boolean hubSignatureScannerDryRun
 
@@ -350,7 +350,7 @@ class DetectProperties {
     @Value('${detect.hub.signature.scanner.host.url}')
     String hubSignatureScannerHostUrl
 
-    @ValueDescription(description="Set this value to false if you would like to exclude your dev requires dependencies when ran", defaultValue='true', group=DetectProperties.GROUP_PACKAGIST)
+    @ValueDescription(description="Set this value to false if you would like to exclude your dev requires dependencies when ran", defaultValue="true", group=DetectProperties.GROUP_PACKAGIST)
     @Value('${detect.packagist.include.dev.dependencies}')
     Boolean packagistIncludeDevDependencies
 
@@ -374,15 +374,15 @@ class DetectProperties {
     @Value('${detect.sbt.included.configurations}')
     String sbtIncludedConfigurationNames
 
-    @ValueDescription(description="The scheme to use when the package managers can not determine a version, either 'text' or 'timestamp'", defaultValue='text', group=DetectProperties.GROUP_PROJECT_INFO)
+    @ValueDescription(description="The scheme to use when the package managers can not determine a version, either 'text' or 'timestamp'", defaultValue="text", group=DetectProperties.GROUP_PROJECT_INFO)
     @Value('${detect.default.project.version.scheme}')
     String defaultProjectVersionScheme
 
-    @ValueDescription(description="The text to use as the default project version", defaultValue='Detect Unknown Version', group=DetectProperties.GROUP_PROJECT_INFO)
+    @ValueDescription(description="The text to use as the default project version", defaultValue="Detect Unknown Version", group=DetectProperties.GROUP_PROJECT_INFO)
     @Value('${detect.default.project.version.text}')
     String defaultProjectVersionText
 
-    @ValueDescription(description="The timestamp format to use as the default project version", defaultValue='yyyy-MM-dd\'T\'HH:mm:ss.SSS', group=DetectProperties.GROUP_PROJECT_INFO)
+    @ValueDescription(description="The timestamp format to use as the default project version", defaultValue="yyyy-MM-dd'T'HH:mm:ss.SSS", group=DetectProperties.GROUP_PROJECT_INFO)
     @Value('${detect.default.project.version.timeformat}')
     String defaultProjectVersionTimeformat
 
@@ -390,19 +390,19 @@ class DetectProperties {
     @Value('${detect.bom.aggregate.name}')
     String aggregateBomName
 
-    @ValueDescription (description="When set to true, a Black Duck risk report in PDF form will be created", defaultValue='false', group=DetectProperties.GROUP_PROJECT_INFO)
+    @ValueDescription (description="When set to true, a Black Duck risk report in PDF form will be created", defaultValue="false", group=DetectProperties.GROUP_PROJECT_INFO)
     @Value('${detect.risk.report.pdf}')
     Boolean riskReportPdf
 
-    @ValueDescription (description="The output directory for risk report in PDF. Default is the source directory", defaultValue='.', group=DetectProperties.GROUP_PROJECT_INFO)
+    @ValueDescription (description="The output directory for risk report in PDF. Default is the source directory", defaultValue=".", group=DetectProperties.GROUP_PROJECT_INFO)
     @Value('${detect.risk.report.pdf.path}')
     String riskReportPdfOutputDirectory
 
-    @ValueDescription (description="When set to true, a Black Duck notices report in text form will be created in your source directory", defaultValue='false', group=DetectProperties.GROUP_PROJECT_INFO)
+    @ValueDescription (description="When set to true, a Black Duck notices report in text form will be created in your source directory", defaultValue="false", group=DetectProperties.GROUP_PROJECT_INFO)
     @Value('${detect.notices.report}')
     Boolean noticesReport
 
-    @ValueDescription (description="The output directory for notices report. Default is the source directory", defaultValue='.', group=DetectProperties.GROUP_PROJECT_INFO)
+    @ValueDescription (description="The output directory for notices report. Default is the source directory", defaultValue=".", group=DetectProperties.GROUP_PROJECT_INFO)
     @Value('${detect.notices.report.path}')
     String noticesReportOutputDirectory
 
@@ -426,7 +426,7 @@ class DetectProperties {
     @Value('${detect.nuget.inspector.air.gap.path}')
     String nugetInspectorAirGapPath
 
-    @ValueDescription(description="The source for nuget packages", defaultValue='https://www.nuget.org/api/v2/', group=DetectProperties.GROUP_NUGET)
+    @ValueDescription(description="The source for nuget packages", defaultValue="https://www.nuget.org/api/v2/", group=DetectProperties.GROUP_NUGET)
     @Value('${detect.nuget.packages.repo.url}')
     String nugetPackagesRepoUrl
 
