@@ -20,49 +20,69 @@
  * specific language governing permissions and limitations
  * under the License.
  */
-package com.blackducksoftware.integration.hub.detect.help
+package com.blackducksoftware.integration.hub.detect.help.print
 
 import org.apache.commons.lang3.StringUtils
-import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.stereotype.Component
+import org.springframework.util.CollectionUtils
+
+import com.blackducksoftware.integration.hub.detect.help.DetectOption
 
 import groovy.transform.TypeChecked
 
 @Component
 @TypeChecked
 class HelpPrinter {
-    @Autowired
-    ValueDescriptionAnnotationFinder valueDescriptionAnnotationFinder
 
-    void printHelpMessage(PrintStream printStream) {
+    void printProfiles(PrintStream printStream, Set<String> profiles, List<String> selectedProfiles) {
+        printStream.println("Available Profiles: " + profiles.join(', '))
+        printStream.println("Selected Profiles: " + selectedProfiles.join(", "))
+    }
+
+    void printHelpMessage(PrintStream printStream, List<DetectOption> options, Set<String> profiles, List<String> selectedProfiles) {
         def helpMessagePieces = []
         helpMessagePieces.add('')
 
-        def headerColumns = [
-            'Property Name',
-            'Default',
-            'Description'
-        ]
+        printProfiles(printStream, profiles, selectedProfiles)
+
+        def headerColumns = ['Property Name', 'Default', 'Description']
 
         String headerText = formatColumns(headerColumns, 50, 30, 95)
         helpMessagePieces.add(headerText)
         helpMessagePieces.add(StringUtils.repeat('_', 175))
+
         String group = null
-        valueDescriptionAnnotationFinder.getDetectValues().each { detectValue ->
+        boolean atLeastOneInGroupPrinted = false
+
+        options.each { detectValue ->
             String currentGroup = detectValue.getGroup()
             if (group == null) {
                 group = currentGroup
+                atLeastOneInGroupPrinted = false
             } else if (!group.equals(currentGroup)) {
-                helpMessagePieces.add('')
+                if (atLeastOneInGroupPrinted){
+                    helpMessagePieces.add('')
+                }
                 group = currentGroup
+                atLeastOneInGroupPrinted = false
             }
-            def bodyColumns = [
-                "--" + detectValue.getKey(),
-                detectValue.getDefaultValue(),
-                detectValue.getDescription()
-            ]
+
+            String matchingProfileDefault = detectValue.getDefaultValue().chosenProfile
+            String actualDefaultValue = detectValue.getDefaultValue().chosenDefault
+
+            String defaultValueHelp = detectValue.getDefaultValue().originalDefault
+            if (matchingProfileDefault != null){
+                defaultValueHelp = actualDefaultValue + " (" + matchingProfileDefault + ")"
+            }
+
+            def bodyColumns = ["--" + detectValue.getKey(), defaultValueHelp, detectValue.getDescription()]
             String bodyText = formatColumns(bodyColumns, 50, 30, 95)
-            helpMessagePieces.add(bodyText)
+
+
+            if (selectedProfiles.empty || CollectionUtils.containsAny(detectValue.getProfiles(), selectedProfiles)){
+                helpMessagePieces.add(bodyText)
+                atLeastOneInGroupPrinted=true;
+            }
         }
         helpMessagePieces.add('')
         helpMessagePieces.add('Usage : ')

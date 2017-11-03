@@ -27,16 +27,25 @@ import groovy.transform.TypeChecked
 @TypeChecked
 public class DetectOption {
     final String key
+    final String fieldName
     final String description
     final Class valueType
-    final String defaultValue
     final String group
+    final String finalValue
+    final String originalValue
 
-    public DetectOption(final String key, final String description, Class valueType, String defaultValue, String group) {
+    final Set<String> profiles
+    final DetectDefaultValue defaultValue
+
+    public DetectOption(final String key, String fieldName, String originalValue, String finalValue, final String description, Class valueType, Set<String> profiles, DetectDefaultValue defaultValue, String group) {
         this.key = key
         this.description = description
         this.valueType = valueType
         this.defaultValue = defaultValue
         this.group = group
+        this.profiles = profiles
+        this.fieldName = fieldName
+        this.originalValue = originalValue
+        this.finalValue = finalValue
     }
 }

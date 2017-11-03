@@ -22,9 +22,6 @@
  */
 package com.blackducksoftware.integration.hub.detect
 
-import java.lang.reflect.Modifier
-import java.nio.charset.StandardCharsets
-
 import org.apache.commons.lang3.BooleanUtils
 import org.apache.commons.lang3.StringUtils
 import org.slf4j.Logger
@@ -43,7 +40,9 @@ import com.blackducksoftware.integration.hub.detect.bomtool.NugetBomTool
 import com.blackducksoftware.integration.hub.detect.exception.DetectException
 import com.blackducksoftware.integration.hub.detect.help.ValueDescription
 import com.blackducksoftware.integration.hub.detect.model.BomToolType
-import com.blackducksoftware.integration.util.ResourceUtil
+import com.blackducksoftware.integration.hub.detect.profile.DryRunProfile
+import com.blackducksoftware.integration.hub.detect.profile.NoScanProfile
+import com.blackducksoftware.integration.hub.detect.profile.OfflineProfile
 import com.google.gson.Gson
 
 import groovy.transform.TypeChecked
@@ -95,8 +94,6 @@ class DetectConfiguration {
 
     @Autowired
     Gson gson
-
-    BuildInfo buildInfo
 
     File sourceDirectory
     File outputDirectory
@@ -169,6 +166,7 @@ class DetectConfiguration {
 
     @ValueDescription(description="This can disable any Hub communication - if true, Detect will not upload BDIO files, it will not check policies, and it will not download and install the signature scanner.", defaultValue="false", group=DetectConfiguration.GROUP_HUB_CONFIGURATION)
     @Value('${blackduck.hub.offline.mode:}')
+    @OfflineProfile(overrideDefault="true")
     Boolean hubOfflineMode
 
     @ValueDescription(description="Source path to inspect", group=DetectConfiguration.GROUP_PATHS)
@@ -385,10 +383,13 @@ class DetectConfiguration {
 
     @ValueDescription(description="Detect creates temporary files in the output directory. If set to true this will clean them up after execution", defaultValue='true', group=DetectConfiguration.GROUP_CLEANUP)
     @Value('${detect.cleanup.bom.tool.files:}')
+    @OfflineProfile(overrideDefault="false")
     Boolean cleanupBomToolFiles
 
     @ValueDescription(description="If set to true, the signature scanner results will not be uploaded to the Hub and the scanner results will be written to disk.", defaultValue='false', group=DetectConfiguration.GROUP_SIGNATURE_SCANNER)
     @Value('${detect.hub.signature.scanner.dry.run:}')
+    @OfflineProfile()
+    @DryRunProfile(overrideDefault="true")
     Boolean hubSignatureScannerDryRun
 
     @ValueDescription(description="Enables you to specify sub-directories to exclude from scans", group=DetectConfiguration.GROUP_SIGNATURE_SCANNER)
@@ -409,6 +410,7 @@ class DetectConfiguration {
 
     @ValueDescription(description="Set to true to disable the Hub Signature Scanner.", defaultValue="false", group=DetectConfiguration.GROUP_SIGNATURE_SCANNER)
     @Value('${detect.hub.signature.scanner.disabled:}')
+    @NoScanProfile(overrideDefault="true")
     Boolean hubSignatureScannerDisabled
 
     @ValueDescription(description="To use a local signature scanner, set its location with this property. This will be the path that contains the 'Hub_Scan_Installation' directory where the signature scanner was unzipped.", group=DetectConfiguration.GROUP_SIGNATURE_SCANNER)
@@ -506,7 +508,6 @@ class DetectConfiguration {
     //properties end
 
     void init() {
-        buildInfo = gson.fromJson(ResourceUtil.getResourceAsString('buildInfo.json', StandardCharsets.UTF_8.toString()), BuildInfo.class)
 
         if (!sourcePath) {
             usingDefaultSourcePath = true
@@ -554,6 +555,19 @@ class DetectConfiguration {
             hubSignatureScannerRelativePathsToExclude.each { String path ->
                 excludedScanPaths.add(new File(sourceDirectory, path).getCanonicalPath())
             }
+        }
+
+        if (gradleInspectorVersion.equals("latest") && gradleBomTool.isBomToolApplicable()){
+            gradleInspectorVersion = gradleBomTool.getInspectorVersion()
+            logger.info("Resolved gradle inspector version from latest to: ${gradleInspectorVersion}")
+        }
+        if (nugetInspectorPackageVersion.equals("latest") && nugetBomTool.isBomToolApplicable()){
+            nugetInspectorPackageVersion = nugetBomTool.getInspectorVersion()
+            logger.info("Resolved nuget inspector version from latest to: ${nugetInspectorPackageVersion}")
+        }
+        if (dockerInspectorVersion.equals("latest") && dockerBomTool.isBomToolApplicable()){
+            dockerInspectorVersion = dockerBomTool.getInspectorVersion()
+            logger.info("Resolved docker inspector version from latest to: ${dockerInspectorVersion}")
         }
     }
 
@@ -625,55 +639,7 @@ class DetectConfiguration {
         return inspectorLocationProperty
     }
 
-    public void logConfiguration() {
-        List<String> configurationPieces = []
-        configurationPieces.add('')
-        configurationPieces.add("Detect Version: ${buildInfo.detectVersion}" as String)
-        configurationPieces.add('Current property values:')
-        configurationPieces.add('-'.multiply(60))
-        def propertyFields = DetectConfiguration.class.getDeclaredFields().findAll {
-            def foundValueAnnotation = it.annotations.find { annotation ->
-                annotation.annotationType() == Value.class
-            }
-            int modifiers = it.modifiers
-            !Modifier.isStatic(modifiers) && Modifier.isPrivate(modifiers) && foundValueAnnotation
-        }.sort { a, b ->
-            a.name <=> b.name
-        }
 
-        propertyFields.each {
-            it.accessible = true
-            String fieldName = it.name
-            Object fieldValue = it.get(this)
-            if (it.type.isArray()) {
-                fieldValue = (fieldValue as String[]).join(', ')
-            }
-            if (fieldName && fieldValue && 'metaClass' != fieldName) {
-                if (fieldName.toLowerCase().contains('password')) {
-                    fieldValue = '*'.multiply((fieldValue as String).length())
-                }
-                if (fieldName.toLowerCase().contains('inspector') && fieldName.toLowerCase().contains('version') && ('latest').equalsIgnoreCase((fieldValue as String)?.trim())) {
-                    String version
-                    if (fieldName.toLowerCase().contains('docker') && dockerBomTool.isBomToolApplicable()) {
-                        version = dockerBomTool.getInspectorVersion()
-                    } else if (fieldName.toLowerCase().contains('nuget') && nugetBomTool.isBomToolApplicable()) {
-                        version = nugetBomTool.getInspectorVersion()
-                    } else if (fieldName.toLowerCase().contains('gradle') && gradleBomTool.isBomToolApplicable()) {
-                        version = gradleBomTool.getInspectorVersion()
-                    }
-                    if (version && !'latest'.equalsIgnoreCase(version)) {
-                        fieldValue = "latest (${version})" as String
-                    }
-                }
-                configurationPieces.add("${fieldName} = ${fieldValue}" as String)
-            }
-            it.accessible = false
-        }
-        configurationPieces.add('-'.multiply(60))
-        configurationPieces.add('')
-        String configurationMessage = configurationPieces.join(System.lineSeparator())
-        logger.info(configurationMessage)
-    }
 
     private int convertInt(Integer integerObj) {
         return integerObj == null ? 0 : integerObj.intValue()

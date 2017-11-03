@@ -38,13 +38,19 @@ import com.blackducksoftware.integration.hub.bdio.BdioTransformer
 import com.blackducksoftware.integration.hub.bdio.SimpleBdioFactory
 import com.blackducksoftware.integration.hub.bdio.model.externalid.ExternalIdFactory
 import com.blackducksoftware.integration.hub.detect.exception.DetectException
-import com.blackducksoftware.integration.hub.detect.help.HelpHtmlWriter
-import com.blackducksoftware.integration.hub.detect.help.HelpPrinter
-import com.blackducksoftware.integration.hub.detect.help.ValueDescriptionAnnotationFinder
+import com.blackducksoftware.integration.hub.detect.help.DetectOption
+import com.blackducksoftware.integration.hub.detect.help.DetectOptionManager
+import com.blackducksoftware.integration.hub.detect.help.print.DetectConfigurationPrinter
+import com.blackducksoftware.integration.hub.detect.help.print.DetectInfoPrinter
+import com.blackducksoftware.integration.hub.detect.help.print.HelpHtmlWriter
+import com.blackducksoftware.integration.hub.detect.help.print.HelpPrinter
 import com.blackducksoftware.integration.hub.detect.hub.HubManager
 import com.blackducksoftware.integration.hub.detect.hub.HubServiceWrapper
 import com.blackducksoftware.integration.hub.detect.hub.HubSignatureScanner
 import com.blackducksoftware.integration.hub.detect.model.DetectProject
+import com.blackducksoftware.integration.hub.detect.onboarding.OnboardingManager
+import com.blackducksoftware.integration.hub.detect.onboarding.OnboardingOption
+import com.blackducksoftware.integration.hub.detect.profile.manager.ProfileManager
 import com.blackducksoftware.integration.hub.detect.summary.DetectSummary
 import com.blackducksoftware.integration.hub.detect.summary.Result
 import com.blackducksoftware.integration.hub.detect.util.DetectFileManager
@@ -66,7 +72,10 @@ class Application {
     private final Logger logger = LoggerFactory.getLogger(Application.class)
 
     @Autowired
-    ValueDescriptionAnnotationFinder valueDescriptionAnnotationFinder
+    DetectOptionManager detectOptionManager
+
+    @Autowired
+    DetectInfo detectInfo
 
     @Autowired
     DetectConfiguration detectConfiguration
@@ -99,32 +108,67 @@ class Application {
     DetectSummary detectSummary
 
     @Autowired
+    ProfileManager profileManager
+
+    @Autowired
+    OnboardingManager onboardingManager
+
+    @Autowired
     DetectFileManager detectFileManager
 
     static void main(final String[] args) {
         new SpringApplicationBuilder(Application.class).logStartupInfo(false).run(args)
     }
 
+    private List<String> getPossibleSelectedProfilesFromArgs() {
+        List<String> profiles = new ArrayList<String>()
+        for (String arg : applicationArguments.getSourceArgs()){
+            if (!arg.contains("=")){
+                if (arg.startsWith("--")){
+                    profiles.add(arg.substring(2))
+                }
+            }
+        }
+        return profiles
+    }
+
     @PostConstruct
     void init() {
         int postResult = 0
         try {
-            valueDescriptionAnnotationFinder.init()
+            detectInfo.init()
+            profileManager.init(getPossibleSelectedProfilesFromArgs())
+            detectOptionManager.init(profileManager.selectedProfiles)
+
+            List<DetectOption> options = detectOptionManager.getDetectOptions()
             if ('-h' in applicationArguments.getSourceArgs() || '--help' in applicationArguments.getSourceArgs()) {
-                helpPrinter.printHelpMessage(System.out)
+                helpPrinter.printHelpMessage(System.out, options, profileManager.availableProfiles(), profileManager.selectedProfiles)
                 return
             }
 
-            detectConfiguration.init()
             if ('-hdoc' in applicationArguments.getSourceArgs() || '--helpdocument' in applicationArguments.getSourceArgs()) {
-                helpHtmlWriter.writeHelpMessage("hub-detect-${detectConfiguration.buildInfo.detectVersion}-help.html")
+                helpHtmlWriter.writeHelpMessage("hub-detect-${detectInfo.detectVersion}-help.html".toString())
                 return
+            }
+
+            List<OnboardingOption> onboardedOptions = new ArrayList<>()
+            if ('-o' in applicationArguments.getSourceArgs() || '--onboard' in applicationArguments.getSourceArgs()) {
+                onboardedOptions = onboardingManager.onboard(profileManager.selectedProfiles)
             }
 
             executableManager.init()
+            detectConfiguration.init()
+
             logger.info('Configuration processed completely.')
+
             if (!detectConfiguration.suppressConfigurationOutput) {
-                detectConfiguration.logConfiguration()
+
+                DetectInfoPrinter infoPrinter = new DetectInfoPrinter();
+                DetectConfigurationPrinter detectConfigurationPrinter = new DetectConfigurationPrinter()
+
+                infoPrinter.printInfo(System.out, detectInfo)
+                helpPrinter.printProfiles(System.out, profileManager.availableProfiles(), profileManager.selectedProfiles)
+                detectConfigurationPrinter.printDetailedConfiguration(System.out, detectConfiguration, options, onboardedOptions)
             }
 
             if (detectConfiguration.testConnection) {

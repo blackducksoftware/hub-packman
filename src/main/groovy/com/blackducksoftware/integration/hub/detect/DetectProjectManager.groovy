@@ -60,6 +60,9 @@ class DetectProjectManager {
     private final Logger logger = LoggerFactory.getLogger(DetectProjectManager.class)
 
     @Autowired
+    DetectInfo detectInfo
+
+    @Autowired
     DetectConfiguration detectConfiguration
 
     @Autowired
@@ -141,7 +144,7 @@ class DetectProjectManager {
         List<File> bdioFiles = []
         MutableDependencyGraph aggregateDependencyGraph = simpleBdioFactory.createMutableDependencyGraph()
 
-        Map<ExternalId, BdioNode> nodeMap = new HashMap<ExternalId, BdioNode>();
+        Map<ExternalId, BdioNode> nodeMap = new HashMap<ExternalId, BdioNode>()
         detectProject.detectCodeLocations.each {
             if (detectConfiguration.aggregateBomName) {
                 aggregateDependencyGraph.addGraphAsChildrenToRoot(it.dependencyGraph)
@@ -184,11 +187,7 @@ class DetectProjectManager {
     }
 
     private String createBdioFilename(BomToolType bomToolType, String finalSourcePathPiece, String projectName, String projectVersionName) {
-        def names = [
-            finalSourcePathPiece,
-            projectName,
-            projectVersionName
-        ]
+        def names = [finalSourcePathPiece, projectName, projectVersionName]
         names.sort { -it.size() }
         String filename = generateFilename(bomToolType, finalSourcePathPiece, projectName, projectVersionName)
         for (int i = 0; (filename.length() >= 255) && (i < 3); i++) {
@@ -204,21 +203,15 @@ class DetectProjectManager {
     }
 
     private String generateFilename(BomToolType bomToolType, String finalSourcePathPiece, String projectName, String projectVersionName) {
-        List<String> safePieces = [
-            bomToolType.toString(),
-            projectName,
-            projectVersionName,
-            finalSourcePathPiece,
-            'bdio'
-        ].collect { integrationEscapeUtil.escapeForUri(it) }
+        List<String> safePieces = [bomToolType.toString(), projectName, projectVersionName, finalSourcePathPiece, 'bdio'].collect { integrationEscapeUtil.escapeForUri(it) }
 
         String filename = (safePieces as Iterable).join('_') + '.jsonld'
         filename
     }
 
     private SimpleBdioDocument createAggregateSimpleBdioDocument(DetectProject detectProject, DependencyGraph dependencyGraph) {
-        final String codeLocationName = '';
-        final String projectName = detectProject.getProjectName();
+        final String codeLocationName = ''
+        final String projectName = detectProject.getProjectName()
         final String projectVersionName = detectProject.projectVersionName
         final ExternalId projectExternalId = simpleBdioFactory.createNameVersionExternalId(new Forge('', '/'), projectName, projectVersionName)
 
@@ -237,7 +230,7 @@ class DetectProjectManager {
     private SimpleBdioDocument createSimpleBdioDocument(String codeLocationName, String projectName, String projectVersionName, ExternalId projectExternalId, DependencyGraph dependencyGraph) {
         SimpleBdioDocument simpleBdioDocument = simpleBdioFactory.createSimpleBdioDocument(codeLocationName, projectName, projectVersionName, projectExternalId, dependencyGraph)
 
-        String hubDetectVersion = detectConfiguration.buildInfo.detectVersion
+        String hubDetectVersion = detectInfo.detectVersion
         def detectVersionData = ['detectVersion' : hubDetectVersion]
         simpleBdioDocument.billOfMaterials.customData = detectVersionData
 
