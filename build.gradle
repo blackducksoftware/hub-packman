@@ -15,6 +15,7 @@ plugins {
     id 'groovy'
     id 'org.springframework.boot' version '1.5.8.RELEASE'
     id 'maven-publish'
+    id 'org.sonarqube' version '2.6.1'
 }
 
 version = '3.0.2-SNAPSHOT'
@@ -85,3 +86,12 @@ dependencies {
 }
 
 springBoot { mainClass = 'com.blackducksoftware.integration.hub.detect.Application' }
+
+sonarqube {
+    properties {
+        property 'sonar.projectName', 'Integrations - Hub Detect'
+        property 'sonar.projectKey', 'com.blackducksoftware:int:hub-detect'
+        property 'sonar.sources', sourceSets.main.groovy.srcDirs
+        property 'sonar.verbose', false
+    }
+}
