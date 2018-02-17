@@ -468,6 +468,14 @@ class DetectConfiguration {
     @Value('${detect.gradle.cleanup.build.blackduck.directory:}')
     Boolean gradleCleanupBuildBlackduckDirectory
 
+    @ValueDescription(description="The name of your gradle build file", defaultValue="build.gradle", group=DetectConfiguration.GROUP_GRADLE)
+    @Value('${detect.gradle.build.filename:}')
+    String gradleBuildFilename
+
+    @ValueDescription(description="The name of your gradle build directory", defaultValue="build", group=DetectConfiguration.GROUP_GRADLE)
+    @Value('${detect.gradle.build.directory:}')
+    String gradleBuildDirectory
+
     @ValueDescription(description="Name of the Nuget Inspector", defaultValue="IntegrationNugetInspector", group=DetectConfiguration.GROUP_NUGET)
     @Value('${detect.nuget.inspector.name:}')
     String nugetInspectorPackageName
@@ -833,6 +841,12 @@ class DetectConfiguration {
     }
     public boolean getGradleCleanupBuildBlackduckDirectory() {
         return BooleanUtils.toBoolean(gradleCleanupBuildBlackduckDirectory)
+    }
+    public String getGradleBuildFilename() {
+        return gradleBuildFilename
+    }
+    public String getGradleBuildDirectory() {
+        return gradleBuildDirectory
     }
     public String getNugetInspectorPackageName() {
         return nugetInspectorPackageName

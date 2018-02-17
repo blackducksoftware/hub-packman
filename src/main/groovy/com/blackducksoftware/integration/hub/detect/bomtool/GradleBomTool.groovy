@@ -44,8 +44,6 @@ import groovy.transform.TypeChecked
 class GradleBomTool extends BomTool {
     private final Logger logger = LoggerFactory.getLogger(GradleBomTool.class)
 
-    static final String BUILD_GRADLE_FILENAME = 'build.gradle'
-
     @Autowired
     HubSignatureScanner hubSignatureScanner
 
@@ -64,7 +62,7 @@ class GradleBomTool extends BomTool {
 
     @Override
     boolean isBomToolApplicable() {
-        def buildGradle = detectFileManager.findFile(sourcePath, BUILD_GRADLE_FILENAME)
+        def buildGradle = detectFileManager.findFile(sourcePath, detectConfiguration.gradleBuildFilename)
 
         if (buildGradle) {
             gradleExecutable = findGradleExecutable(sourcePath)
@@ -80,7 +78,7 @@ class GradleBomTool extends BomTool {
     List<DetectCodeLocation> extractDetectCodeLocations(DetectProject detectProject) {
         List<DetectCodeLocation> codeLocations = extractCodeLocationsFromGradle(detectProject)
 
-        File[] additionalTargets = detectFileManager.findFilesToDepth(detectConfiguration.sourceDirectory, 'build', detectConfiguration.searchDepth)
+        File[] additionalTargets = detectFileManager.findFilesToDepth(detectConfiguration.sourceDirectory, detectConfiguration.gradleBuildDirectory, detectConfiguration.searchDepth)
         if (additionalTargets) {
             additionalTargets.each { File file ->
                 hubSignatureScanner.registerPathToScan(file)
@@ -104,6 +102,8 @@ class GradleBomTool extends BomTool {
         gradleCommand = gradleCommand?.replace('dependencies', '')?.trim()
 
         def arguments = []
+        arguments.add('-b')
+        arguments.add(detectConfiguration.gradleBuildFilename)
         if (gradleCommand) {
             arguments.addAll(gradleCommand.split(' ') as List)
         }
@@ -114,7 +114,7 @@ class GradleBomTool extends BomTool {
         Executable executable = new Executable(sourceDirectory, gradleExecutable, arguments)
         executableRunner.execute(executable)
 
-        File buildDirectory = new File(sourcePath, 'build')
+        File buildDirectory = new File(sourcePath, detectConfiguration.gradleBuildDirectory)
         File blackduckDirectory = new File(buildDirectory, 'blackduck')
 
         File[] codeLocationFiles = detectFileManager.findFiles(blackduckDirectory, '*_dependencyGraph.txt')
