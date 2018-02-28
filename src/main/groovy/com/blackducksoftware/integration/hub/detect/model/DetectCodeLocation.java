@@ -1,4 +1,4 @@
-/*
+/**
  * hub-detect
  *
  * Copyright (C) 2018 Black Duck Software, Inc.
@@ -127,4 +127,5 @@ public class DetectCodeLocation {
     public List<String> getAdditionalNamePieces() {
         return additionalNamePieces;
     }
+
 }
