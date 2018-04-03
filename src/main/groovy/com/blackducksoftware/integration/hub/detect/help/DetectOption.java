@@ -33,6 +33,7 @@ public class DetectOption {
     final String defaultValue;
     final String resolvedValue;
     public String interactiveValue = null;
+    public DetailedDetectOption detailedDetectOption;
 
     public DetectOption(final String key, final String fieldName, final String originalValue, final String resolvedValue, final String description, final Class<?> valueType, final String defaultValue, final String group) {
         this.key = key;
@@ -43,6 +44,15 @@ public class DetectOption {
         this.fieldName = fieldName;
         this.originalValue = originalValue;
         this.resolvedValue = resolvedValue;
+        detailedDetectOption = new DetailedDetectOption();
+    }
+
+    public DetailedDetectOption getDetailedDetectOption() {
+        return detailedDetectOption;
+    }
+
+    public void setDetailedDetectOption(final DetailedDetectOption detailedDetectOption) {
+        this.detailedDetectOption = detailedDetectOption;
     }
 
     public String getInteractiveValue() {

@@ -29,21 +29,27 @@ import java.util.Arrays;
 import java.util.List;
 
 import org.apache.commons.lang3.StringUtils;
-import org.springframework.stereotype.Component;
 
 import com.blackducksoftware.integration.hub.detect.help.DetectOption;
 
-@Component
 public class HelpPrinter {
+    PrintStream printStream;
 
-    public void printHelpMessage(final PrintStream printStream, final List<DetectOption> options) {
+    public HelpPrinter(final PrintStream printStream) {
+        this.printStream = printStream;
+    }
+
+    public void printHelpMessage(final List<DetectOption> options) {
         final List<String> helpMessagePieces = new ArrayList<>();
+        helpMessagePieces.add("");
+        helpMessagePieces.add("To get further details on a specific property, please run -h -p specific.property.name.");
+        helpMessagePieces.add("To get a list of all property groups, please run -h -g. With a group name, you can print all properties of a spceific group using -h -g groupName");
         helpMessagePieces.add("");
 
         final List<String> headerColumns = Arrays.asList("Property Name", "Default", "Description");
         final String headerText = formatColumns(headerColumns, 51, 30, 95);
         helpMessagePieces.add(headerText);
-        helpMessagePieces.add(StringUtils.repeat('_', 175));
+        helpMessagePieces.add(StringUtils.repeat('=', 175));
 
         String group = null;
 
@@ -52,6 +58,10 @@ public class HelpPrinter {
             if (group == null) {
                 group = currentGroup;
             } else if (!group.equals(currentGroup)) {
+                helpMessagePieces.add(StringUtils.repeat('=', 175));
+                group = currentGroup;
+            } else {
+                helpMessagePieces.add(StringUtils.repeat('_', 175));
                 helpMessagePieces.add("");
                 group = currentGroup;
             }
@@ -65,10 +75,56 @@ public class HelpPrinter {
         helpMessagePieces.add("\t--<property name>=<value>");
         helpMessagePieces.add("");
 
-        printMessage(printStream, helpMessagePieces);
+        printMessage(helpMessagePieces);
     }
 
-    private void printMessage(final PrintStream printStream, final List<String> message) {
+    public void printVerboseMessage() {
+        final List<String> verboseMessagePieces = new ArrayList<>();
+
+        verboseMessagePieces.add("");
+        verboseMessagePieces.add("Basic list of properties:");
+        verboseMessagePieces.add("(To see a more complete listing of all properties, please run the -h -v command.)");
+
+        printMessage(verboseMessagePieces);
+    }
+
+    public void printHelpDetailedMessage(final DetectOption detectOption) {
+        final List<String> detailedMessage = new ArrayList<>();
+
+        detailedMessage.add("");
+        detailedMessage.add("Detailed information for " + detectOption.getKey());
+        detailedMessage.add("");
+        detailedMessage.add("Property description: " + detectOption.getDescription());
+        detailedMessage.add("Property default value: " + detectOption.getDefaultValue());
+        detailedMessage.add("");
+
+        detailedMessage.add("Use cases: " + detectOption.getDetailedDetectOption().useCases);
+        detailedMessage.add("");
+        detailedMessage.add("Common issues: " + detectOption.getDetailedDetectOption().issues);
+        detailedMessage.add("");
+
+        printMessage(detailedMessage);
+    }
+
+    public void printHelpGroupsMessage(final List<String> detectGroups) {
+        final List<String> groupsMessage = new ArrayList<>();
+
+        groupsMessage.add("");
+        groupsMessage.add("To get a list of all properties related to a group, please run -h -g groupName");
+        groupsMessage.add("");
+
+        groupsMessage.add("Group Listing:");
+        detectGroups.forEach(group -> groupsMessage.add(group));
+        groupsMessage.add("");
+
+        printMessage(groupsMessage);
+    }
+
+    public void printUnknownCommandMessage() {
+
+    }
+
+    private void printMessage(final List<String> message) {
         printStream.println(String.join(System.lineSeparator(), message));
     }
 

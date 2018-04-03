@@ -23,7 +23,10 @@
  */
 package com.blackducksoftware.integration.hub.detect.help;
 
+import java.io.FileNotFoundException;
+import java.io.FileReader;
 import java.lang.reflect.Field;
+import java.lang.reflect.Type;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.Comparator;
@@ -42,6 +45,9 @@ import org.springframework.stereotype.Component;
 import com.blackducksoftware.integration.hub.detect.DetectConfiguration;
 import com.blackducksoftware.integration.hub.detect.interactive.InteractiveOption;
 import com.blackducksoftware.integration.hub.detect.util.SpringValueUtils;
+import com.google.gson.Gson;
+import com.google.gson.reflect.TypeToken;
+import com.google.gson.stream.JsonReader;
 
 @Component
 public class DetectOptionManager {
@@ -49,6 +55,9 @@ public class DetectOptionManager {
 
     @Autowired
     public DetectConfiguration detectConfiguration;
+
+    @Autowired
+    public Gson gson;
 
     private List<DetectOption> detectOptions;
     private List<String> detectGroups;
@@ -64,11 +73,23 @@ public class DetectOptionManager {
     public void init() {
         final Map<String, DetectOption> detectOptionsMap = new HashMap<>();
         detectGroups = new ArrayList<>();
+        Map<String, DetailedDetectOption> optionDetails = new HashMap<>();
+
+        try {
+            final Type detailedDetectOptionType = new TypeToken<HashMap<String, DetailedDetectOption>>() {
+            }.getType();
+            final String detectDetailedOptions = getClass().getResource("/detect-options.json").getFile();
+            final FileReader fileReader = new FileReader(detectDetailedOptions);
+            final JsonReader jsonReader = new JsonReader(fileReader);
+            optionDetails = gson.fromJson(jsonReader, detailedDetectOptionType);
+        } catch (final FileNotFoundException e) {
+            logger.warn("detect-options.json file not found. Can't use detailed properties help option.");
+        }
 
         for (final Field field : DetectConfiguration.class.getDeclaredFields()) {
             try {
                 if (field.isAnnotationPresent(ValueDescription.class)) {
-                    final DetectOption option = processField(detectConfiguration, DetectConfiguration.class, field);
+                    final DetectOption option = processField(detectConfiguration, DetectConfiguration.class, field, optionDetails);
                     if (option != null) {
                         if (!detectOptionsMap.containsKey(option.key)) {
                             detectOptionsMap.put(option.key, option);
@@ -98,7 +119,7 @@ public class DetectOptionManager {
         }).collect(Collectors.toList());
     }
 
-    private DetectOption processField(final Object obj, final Class<?> objClz, final Field field) throws IllegalArgumentException, IllegalAccessException {
+    private DetectOption processField(final Object obj, final Class<?> objClz, final Field field, final Map<String, DetailedDetectOption> detailedDetectOptionsMap) throws IllegalArgumentException, IllegalAccessException {
         final String fieldName = field.getName();
         String key = "";
         String description = "";
@@ -127,7 +148,14 @@ public class DetectOptionManager {
             resolvedValue = field.get(obj).toString();
         }
 
-        return new DetectOption(key, fieldName, originalValue, resolvedValue, description, valueType, defaultValue, group);
+        final DetectOption detectOption = new DetectOption(key, fieldName, originalValue, resolvedValue, description, valueType, defaultValue, group);
+        final DetailedDetectOption detailedDetectOption = detailedDetectOptionsMap.get(key);
+
+        if (detailedDetectOption != null) {
+            detectOption.setDetailedDetectOption(detailedDetectOption);
+        }
+
+        return detectOption;
     }
 
     public void applyInteractiveOptions(final List<InteractiveOption> interactiveOptions) {
