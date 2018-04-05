@@ -145,9 +145,8 @@ public class HubServiceWrapper {
         hubServerConfigBuilder.setUsername(detectConfiguration.getHubUsername());
         hubServerConfigBuilder.setPassword(detectConfiguration.getHubPassword());
         hubServerConfigBuilder.setApiToken(detectConfiguration.getHubApiToken());
-        if(detectConfiguration.getHubOnPremise())
-        {
-            logger.debug("Hub deployed on premise, bypassing proxy settings");
+        if(detectConfiguration.getHubOnPremise()) {
+            logger.debug("Hub deployed on premise, bypassing proxy settings.");
             hubServerConfigBuilder.setProxyHost(null);
             hubServerConfigBuilder.setProxyPort(null);
             hubServerConfigBuilder.setProxyUsername(null);

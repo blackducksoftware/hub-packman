@@ -390,7 +390,7 @@ public class DetectConfiguration {
     @Value("${blackduck.hub.password:}")
     private String hubPassword;
     
-    @ValueDescription(description = "If true, proxy connectiont is bypassed for an on premise Hub installation.", defaultValue = "false", group = DetectConfiguration.GROUP_HUB_CONFIGURATION)
+    @ValueDescription(description = "If true, proxy connection is bypassed for an on premise Hub installation.", defaultValue = "false", group = DetectConfiguration.GROUP_HUB_CONFIGURATION)
     @Value("${blackduck.hub.onpremise:}")
     private Boolean hubOnPremise;
 
@@ -819,7 +819,7 @@ public class DetectConfiguration {
     }
 
     public Boolean getHubOnPremise()  {
-        return hubOnPremise;
+        return BooleanUtils.toBoolean(hubOnPremise);
     }
     public String getHubApiToken() {
         return hubApiToken;
