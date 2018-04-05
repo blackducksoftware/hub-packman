@@ -145,13 +145,23 @@ public class HubServiceWrapper {
         hubServerConfigBuilder.setUsername(detectConfiguration.getHubUsername());
         hubServerConfigBuilder.setPassword(detectConfiguration.getHubPassword());
         hubServerConfigBuilder.setApiToken(detectConfiguration.getHubApiToken());
+        if(detectConfiguration.getHubOnPremise()) {
+            logger.debug("Hub deployed on premise, bypassing proxy settings.");
+            hubServerConfigBuilder.setProxyHost(null);
+            hubServerConfigBuilder.setProxyPort(null);
+            hubServerConfigBuilder.setProxyUsername(null);
+            hubServerConfigBuilder.setProxyPassword(null);
+            hubServerConfigBuilder.setProxyNtlmDomain(null);
+            hubServerConfigBuilder.setProxyNtlmWorkstation(null);
+        } else {
+            hubServerConfigBuilder.setProxyHost(detectConfiguration.getHubProxyHost());
+            hubServerConfigBuilder.setProxyPort(detectConfiguration.getHubProxyPort());
+            hubServerConfigBuilder.setProxyUsername(detectConfiguration.getHubProxyUsername());
+            hubServerConfigBuilder.setProxyPassword(detectConfiguration.getHubProxyPassword());
+            hubServerConfigBuilder.setProxyNtlmDomain(detectConfiguration.getHubProxyNtlmDomain());
+            hubServerConfigBuilder.setProxyNtlmWorkstation(detectConfiguration.getHubProxyNtlmWorkstation());
+        }
 
-        hubServerConfigBuilder.setProxyHost(detectConfiguration.getHubProxyHost());
-        hubServerConfigBuilder.setProxyPort(detectConfiguration.getHubProxyPort());
-        hubServerConfigBuilder.setProxyUsername(detectConfiguration.getHubProxyUsername());
-        hubServerConfigBuilder.setProxyPassword(detectConfiguration.getHubProxyPassword());
-        hubServerConfigBuilder.setProxyNtlmDomain(detectConfiguration.getHubProxyNtlmDomain());
-        hubServerConfigBuilder.setProxyNtlmWorkstation(detectConfiguration.getHubProxyNtlmWorkstation());
         hubServerConfigBuilder.setAlwaysTrustServerCertificate(detectConfiguration.getHubTrustCertificate());
         hubServerConfigBuilder.setLogger(slf4jIntLogger);
 
