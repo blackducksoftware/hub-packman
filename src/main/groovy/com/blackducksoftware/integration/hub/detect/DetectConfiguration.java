@@ -389,6 +389,10 @@ public class DetectConfiguration {
     @ValueDescription(description = "Hub password", group = DetectConfiguration.GROUP_HUB_CONFIGURATION)
     @Value("${blackduck.hub.password:}")
     private String hubPassword;
+    
+    @ValueDescription(description = "If true, proxy connectiont is bypassed for an on premise Hub installation.", defaultValue = "false", group = DetectConfiguration.GROUP_HUB_CONFIGURATION)
+    @Value("${blackduck.hub.onpremise:}")
+    private Boolean hubOnPremise;
 
     @ValueDescription(description = "Hub API Token", group = DetectConfiguration.GROUP_HUB_CONFIGURATION)
     @Value("${blackduck.hub.api.token:}")
@@ -814,6 +818,9 @@ public class DetectConfiguration {
         return hubPassword;
     }
 
+    public Boolean getHubOnPremise()  {
+        return hubOnPremise;
+    }
     public String getHubApiToken() {
         return hubApiToken;
     }
