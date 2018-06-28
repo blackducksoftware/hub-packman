@@ -83,13 +83,7 @@ public class BomToolFinder {
             final Set<BomToolType> applied = new HashSet<>();
             final List<BomToolEvaluation> evaluations = processDirectory(bomToolSearchProvider, directory, appliedBefore, depth, options);
             results.addAll(evaluations);
-
-            final List<BomToolType> appliedBomTools = evaluations.stream()
-                    .filter(it -> it.isApplicable())
-                    .map(it -> it.bomTool.getBomToolType())
-                    .collect(Collectors.toList());
-
-            applied.addAll(appliedBomTools);
+            applied.addAll(evaluations.stream().map(it -> it.bomTool.getBomToolType()).collect(Collectors.toList()));
 
             // TODO: Used to have a remaining bom tools and would bail early here, not sure how to go about that?
             final Set<BomToolType> everApplied = new HashSet<>();
