@@ -20,7 +20,7 @@ notifications:
     - bdsoss@blackducksoftware.com
 
 script:
-- "./gradlew clean build jacocoTestReport coveralls sonarqube"
+- "./gradlew clean build jacocoTestReport coveralls"
 
 after_success:
 - bash <(curl -s https://copilot.blackducksoftware.com/ci/travis/scripts/upload)
