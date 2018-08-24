@@ -66,7 +66,6 @@ import com.blackducksoftware.integration.hub.detect.help.HelpDetailed;
 import com.blackducksoftware.integration.hub.detect.help.HelpGroup;
 
 public enum DetectProperty {
-
     @HelpGroup(primary = GROUP_GENERAL)
     @HelpDescription("If true, detect will always exit with code 0.")
     DETECT_FORCE_SUCCESS("detect.force.success", DetectPropertyType.BOOLEAN, "false"),
@@ -758,9 +757,15 @@ public enum DetectProperty {
     @HelpGroup(primary = GROUP_YARN)
     DETECT_YARN_PROD_ONLY("detect.yarn.prod.only", DetectPropertyType.BOOLEAN, "false");
 
+    private static DetectConfiguration detectConfiguration;
+
     private final String propertyName;
     private final DetectPropertyType propertyType;
     private final String defaultValue;
+
+    public static void setDetectConfiguration(DetectConfiguration detectConfiguration) {
+        DetectProperty.detectConfiguration = detectConfiguration;
+    }
 
     DetectProperty(final String propertyName, final DetectPropertyType propertyType) {
         this.propertyName = propertyName;
@@ -792,6 +797,26 @@ public enum DetectProperty {
             defaultValue = getDefaultValue();
         }
         return value.equals(defaultValue);
+    }
+
+    public boolean getBooleanValue() {
+        return detectConfiguration.getBooleanProperty(this);
+    }
+
+    public Long getLongValue() {
+        return detectConfiguration.getLongProperty(this);
+    }
+
+    public Integer getIntegerValue() {
+        return detectConfiguration.getIntegerProperty(this);
+    }
+
+    public String[] getStringArrayValue() {
+        return detectConfiguration.getStringArrayProperty(this);
+    }
+
+    public String getStringValue() {
+        return detectConfiguration.getPropertyValueAsString(this);
     }
 
     public final class PropertyConstants {

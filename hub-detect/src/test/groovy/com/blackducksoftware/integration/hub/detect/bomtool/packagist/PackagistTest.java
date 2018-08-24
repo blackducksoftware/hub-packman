@@ -19,6 +19,7 @@ public class PackagistTest {
     @Test
     public void packagistParserTest() throws IOException {
         final DetectConfiguration detectConfiguration = Mockito.mock(DetectConfiguration.class);
+        DetectProperty.setDetectConfiguration(detectConfiguration);
         Mockito.when(detectConfiguration.getBooleanProperty(DetectProperty.DETECT_PACKAGIST_INCLUDE_DEV_DEPENDENCIES)).thenReturn(true);
 
         final PackagistParser packagistParser = new PackagistParser(new ExternalIdFactory(), detectConfiguration);

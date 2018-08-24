@@ -66,6 +66,8 @@ public class DetectConfiguration {
                 }
             }
         });
+
+        DetectProperty.setDetectConfiguration(this);
     }
 
     // TODO: Remove in version 6.
