@@ -63,8 +63,8 @@ public class PackagistParser {
         final NameVersion projectNameVersion = parseNameVersionFromJson(composerJsonObject);
 
         final JsonObject composerLockObject = new JsonParser().parse(composerLockText).getAsJsonObject();
-        final List<PackagistPackage> models = convertJsonToModel(composerLockObject, detectConfiguration.getBooleanProperty(DetectProperty.DETECT_PACKAGIST_INCLUDE_DEV_DEPENDENCIES));
-        final List<NameVersion> rootPackages = parseDependencies(composerJsonObject, detectConfiguration.getBooleanProperty(DetectProperty.DETECT_PACKAGIST_INCLUDE_DEV_DEPENDENCIES));
+        final List<PackagistPackage> models = convertJsonToModel(composerLockObject, DetectProperty.DETECT_PACKAGIST_INCLUDE_DEV_DEPENDENCIES.getBooleanValue());
+        final List<NameVersion> rootPackages = parseDependencies(composerJsonObject, DetectProperty.DETECT_PACKAGIST_INCLUDE_DEV_DEPENDENCIES.getBooleanValue());
 
         models.forEach(it -> {
             final ExternalId id = externalIdFactory.createNameVersionExternalId(Forge.PACKAGIST, it.getNameVersion().getName(), it.getNameVersion().getVersion());

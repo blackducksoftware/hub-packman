@@ -66,6 +66,8 @@ public class DetectConfiguration {
                 handleOverrideProperty(currentProperty, deprecated);// an override property has a deprecated property
             }
         });
+
+        DetectProperty.setDetectConfiguration(this);
     }
 
     private void handleStandardProperty(final DetectProperty currentProperty) {
