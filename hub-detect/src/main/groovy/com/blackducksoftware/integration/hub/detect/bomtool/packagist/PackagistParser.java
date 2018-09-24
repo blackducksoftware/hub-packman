@@ -31,8 +31,7 @@ import org.slf4j.LoggerFactory;
 
 import com.blackducksoftware.integration.hub.detect.bomtool.BomToolGroupType;
 import com.blackducksoftware.integration.hub.detect.bomtool.BomToolType;
-import com.blackducksoftware.integration.hub.detect.configuration.DetectConfiguration;
-import com.blackducksoftware.integration.hub.detect.configuration.DetectProperty;
+import com.blackducksoftware.integration.hub.detect.configuration.DetectTypedConfiguration;
 import com.blackducksoftware.integration.hub.detect.workflow.codelocation.DetectCodeLocation;
 import com.google.gson.JsonElement;
 import com.google.gson.JsonObject;
@@ -49,11 +48,11 @@ public class PackagistParser {
     private final Logger logger = LoggerFactory.getLogger(PackagistParser.class);
 
     private final ExternalIdFactory externalIdFactory;
-    private final DetectConfiguration detectConfiguration;
+    private final DetectTypedConfiguration detectTypedConfiguration;
 
-    public PackagistParser(final ExternalIdFactory externalIdFactory, final DetectConfiguration detectConfiguration) {
+    public PackagistParser(final ExternalIdFactory externalIdFactory, final DetectTypedConfiguration detectTypedConfiguration) {
         this.externalIdFactory = externalIdFactory;
-        this.detectConfiguration = detectConfiguration;
+        this.detectTypedConfiguration = detectTypedConfiguration;
     }
 
     public PackagistParseResult getDependencyGraphFromProject(final BomToolType bomToolType, final String sourcePath, final String composerJsonText, final String composerLockText) {
@@ -63,8 +62,8 @@ public class PackagistParser {
         final NameVersion projectNameVersion = parseNameVersionFromJson(composerJsonObject);
 
         final JsonObject composerLockObject = new JsonParser().parse(composerLockText).getAsJsonObject();
-        final List<PackagistPackage> models = convertJsonToModel(composerLockObject, detectConfiguration.getBooleanProperty(DetectProperty.DETECT_PACKAGIST_INCLUDE_DEV_DEPENDENCIES));
-        final List<NameVersion> rootPackages = parseDependencies(composerJsonObject, detectConfiguration.getBooleanProperty(DetectProperty.DETECT_PACKAGIST_INCLUDE_DEV_DEPENDENCIES));
+        final List<PackagistPackage> models = convertJsonToModel(composerLockObject, detectTypedConfiguration.getDetectPackagistIncludeDevDependencies());
+        final List<NameVersion> rootPackages = parseDependencies(composerJsonObject, detectTypedConfiguration.getDetectPackagistIncludeDevDependencies());
 
         models.forEach(it -> {
             final ExternalId id = externalIdFactory.createNameVersionExternalId(Forge.PACKAGIST, it.getNameVersion().getName(), it.getNameVersion().getVersion());

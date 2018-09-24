@@ -24,19 +24,25 @@
 package com.blackducksoftware.integration.hub.detect.configuration;
 
 public enum DetectPropertyType {
-    BOOLEAN("Boolean"),
-    STRING("String"),
-    STRING_ARRAY("String[]"),
-    INTEGER("Integer"),
-    LONG("Long");
+    BOOLEAN("Boolean", "getBooleanProperty"),
+    STRING("String", "getProperty"),
+    STRING_ARRAY("String[]", "getStringArrayProperty"),
+    INTEGER("Integer", "getIntegerProperty"),
+    LONG("Long", "getLongProperty");
 
     private final String displayName;
+    private final String detectGetter;
 
-    private DetectPropertyType(final String displayName) {
+    private DetectPropertyType(final String displayName, final String detectGetter) {
         this.displayName = displayName;
+        this.detectGetter = detectGetter;
     }
 
     public String getDisplayName() {
         return displayName;
+    }
+
+    public String getDetectGetter() {
+        return detectGetter;
     }
 }
