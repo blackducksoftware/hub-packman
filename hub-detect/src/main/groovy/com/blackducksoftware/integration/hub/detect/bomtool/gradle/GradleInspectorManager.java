@@ -91,7 +91,7 @@ public class GradleInspectorManager {
             if (airGapMavenMetadataFile.exists()) {
                 xmlDocument = mavenMetadataService.fetchXmlDocumentFromFile(airGapMavenMetadataFile);
             } else {
-                final String mavenMetadataUrl = "http://repo2.maven.org/maven2/com/blackducksoftware/integration/integration-gradle-inspector/maven-metadata.xml";
+                final String mavenMetadataUrl = "https://repo1.maven.org/maven2/com/blackducksoftware/integration/integration-gradle-inspector/maven-metadata.xml";
                 xmlDocument = mavenMetadataService.fetchXmlDocumentFromUrl(mavenMetadataUrl);
             }
 
