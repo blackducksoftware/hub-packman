@@ -91,7 +91,8 @@ public class GradleInspectorManager {
             if (airGapMavenMetadataFile.exists()) {
                 xmlDocument = mavenMetadataService.fetchXmlDocumentFromFile(airGapMavenMetadataFile);
             } else {
-                final String mavenMetadataUrl = "https://repo1.maven.org/maven2/com/blackducksoftware/integration/integration-gradle-inspector/maven-metadata.xml";
+                final String mavenMetadataUrl = detectConfiguration.getProperty(DetectProperty.DETECT_GRADLE_INSPECTOR_REPOSITORY_URL)
+                        + "com/blackducksoftware/integration/integration-gradle-inspector/maven-metadata.xml";
                 xmlDocument = mavenMetadataService.fetchXmlDocumentFromUrl(mavenMetadataUrl);
             }
 
@@ -129,10 +130,7 @@ public class GradleInspectorManager {
             logger.debug(e.getMessage());
         }
 
-        final String gradleInspectorRepositoryUrl = detectConfiguration.getProperty(DetectProperty.DETECT_GRADLE_INSPECTOR_REPOSITORY_URL);
-        if (StringUtils.isNotBlank(gradleInspectorRepositoryUrl)) {
-            model.put("customRepositoryUrl", gradleInspectorRepositoryUrl);
-        }
+        model.put("repositoryUrl", detectConfiguration.getProperty(DetectProperty.DETECT_GRADLE_INSPECTOR_REPOSITORY_URL));
         final Template initScriptTemplate = configuration.getTemplate("init-script-gradle.ftl");
 
         final Writer fileWriter = new FileWriter(initScriptFile);

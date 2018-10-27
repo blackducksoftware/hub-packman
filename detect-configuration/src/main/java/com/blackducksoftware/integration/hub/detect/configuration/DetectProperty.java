@@ -772,7 +772,7 @@ public enum DetectProperty {
 
     @HelpGroup(primary = GROUP_GRADLE)
     @HelpDescription("The respository gradle should use to look for the gradle inspector")
-    DETECT_GRADLE_INSPECTOR_REPOSITORY_URL("detect.gradle.inspector.repository.url", "3.0.0", DetectPropertyType.STRING),
+    DETECT_GRADLE_INSPECTOR_REPOSITORY_URL("detect.gradle.inspector.repository.url", "3.0.0", DetectPropertyType.STRING, "https://repo1.maven.org/maven2/"),
 
     @HelpGroup(primary = GROUP_HEX)
     @HelpDescription("The path of the rebar3 executable")

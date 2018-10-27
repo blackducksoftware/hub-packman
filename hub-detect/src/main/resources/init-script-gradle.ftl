@@ -9,25 +9,20 @@ import com.blackducksoftware.integration.gradle.DependencyGatherer
 initscript {
 <#if airGapLibsPath??>
     println 'Running air gapped from ${airGapLibsPath}'
-<#elseif customRepositoryUrl??>
-    println 'Running in online mode with url: ${customRepositoryUrl}'
 <#else>
-    println 'Running in online mode'
+    println 'Running in online mode with url: ${repositoryUrl}'
 </#if>
     repositories {
 <#if airGapLibsPath??>
         flatDir {
             dirs '${airGapLibsPath}'
         }
-<#elseif customRepositoryUrl??>
+<#else>
         mavenLocal()
         maven {
             name 'UserDefinedRepository'
-            url '${customRepositoryUrl}'
+            url '${repositoryUrl}'
         }
-<#else>
-        mavenLocal()
-        mavenCentral()
 </#if>
     }
 
